@@ -61,15 +61,14 @@ interface Slide {
 
 // === Data ===
 const SLIDES: Slide[] = [
-  { id: 0, title: 'Title & Context', subtitle: 'DeFi Actions Mode' },
-  { id: 1, title: 'Discovery', subtitle: 'Problem & Opportunity' },
-  { id: 2, title: 'Proposed Feature', subtitle: 'DeFi Actions Mode' },
-  { id: 3, title: 'Target Segments', subtitle: 'Who It Serves' },
-  { id: 4, title: 'Design Scope', subtitle: 'MVP Definition' },
-  { id: 5, title: 'Development Plan', subtitle: 'Epics & Timeline' },
-  { id: 6, title: 'Deployment', subtitle: 'Rollout & GTM' },
-  { id: 7, title: 'Strategic Fit', subtitle: 'Next Steps' },
-  { id: 8, title: 'Live Demo', subtitle: 'Interactive Prototype' },
+  { id: 0, title: 'Overview', subtitle: '' },
+  { id: 1, title: 'Discovery', subtitle: 'The Gap' },
+  { id: 2, title: 'Solution', subtitle: 'DeFi Actions Mode' },
+  { id: 3, title: 'Design', subtitle: 'MVP Scope' },
+  { id: 4, title: 'Development', subtitle: 'Epics' },
+  { id: 5, title: 'Deployment', subtitle: 'Rollout' },
+  { id: 6, title: 'Next Steps', subtitle: '' },
+  { id: 7, title: 'Demo', subtitle: '' },
 ];
 
 const DEFI_ACTIONS: DeFiAction[] = [
@@ -176,88 +175,7 @@ function CodeBlock({ code }: { code: string }) {
   );
 }
 
-function ComparisonTable() {
-  return (
-    <div className="comparison-table">
-      <div className="comparison-col today">
-        <div className="col-header">
-          <span className="col-icon">📦</span>
-          <h4>Today</h4>
-        </div>
-        <ul>
-          <li><span className="bullet red">✗</span> Must know vault token addresses</li>
-          <li><span className="bullet red">✗</span> Configure Composer as a tool</li>
-          <li><span className="bullet red">✗</span> Treat everything as "swap to token"</li>
-          <li><span className="bullet red">✗</span> Manage UX around vault tokens</li>
-          <li><span className="bullet red">✗</span> High integration complexity</li>
-        </ul>
-      </div>
-      <div className="comparison-arrow">→</div>
-      <div className="comparison-col future">
-        <div className="col-header">
-          <span className="col-icon">✨</span>
-          <h4>DeFi Actions Mode</h4>
-        </div>
-        <ul>
-          <li><span className="bullet green">✓</span> Intent-based: "Deposit into X"</li>
-          <li><span className="bullet green">✓</span> Hides vault token complexity</li>
-          <li><span className="bullet green">✓</span> Centralized safety in LI.FI</li>
-          <li><span className="bullet green">✓</span> Minimal config for integrators</li>
-          <li><span className="bullet green">✓</span> Production-ready flows</li>
-        </ul>
-      </div>
-    </div>
-  );
-}
 
-function SegmentCard({ icon, title, needs, benefit }: { icon: string; title: string; needs: string; benefit: string }) {
-  return (
-    <div className="segment-card">
-      <div className="segment-icon">{icon}</div>
-      <h4>{title}</h4>
-      <p className="segment-needs">{needs}</p>
-      <div className="segment-benefit">
-        <span className="benefit-label">With DeFi Actions:</span>
-        <span className="benefit-text">{benefit}</span>
-      </div>
-    </div>
-  );
-}
-
-function Timeline({ items }: { items: { phase: string; duration: string; tasks: string[] }[] }) {
-  return (
-    <div className="timeline">
-      {items.map((item, i) => (
-        <div key={i} className="timeline-item">
-          <div className="timeline-marker">
-            <span className="marker-number">{i + 1}</span>
-          </div>
-          <div className="timeline-content">
-            <div className="timeline-header">
-              <h4>{item.phase}</h4>
-              <span className="timeline-duration">{item.duration}</span>
-            </div>
-            <ul>
-              {item.tasks.map((task, j) => (
-                <li key={j}>{task}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function MetricCard({ label, value, subtext, trend }: { label: string; value: string; subtext: string; trend?: 'up' | 'down' }) {
-  return (
-    <div className="metric-card">
-      <span className="metric-label">{label}</span>
-      <span className="metric-value">{value}</span>
-      <span className={`metric-subtext ${trend || ''}`}>{subtext}</span>
-    </div>
-  );
-}
 
 // Interactive Widget Mockup
 function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
@@ -586,7 +504,7 @@ export default function DeFiActionsDemo() {
   const goToSlide = useCallback((idx: number) => {
     if (idx >= 0 && idx < SLIDES.length) {
       setCurrentSlide(idx);
-      if (idx === 8) {
+      if (idx === 7) {
         setSelectedAction(null);
         setWidgetStep('select');
       }
@@ -632,18 +550,25 @@ export default function DeFiActionsDemo() {
         return (
           <div className="slide slide-title">
             <div className="title-content">
-              <div className="title-badge">LI.FI Widget Enhancement</div>
+              <div className="title-badge">Widget Product Iteration</div>
               <h1 className="main-title">
                 DeFi Actions Mode
-                <span className="subtitle-line">Composer-Powered</span>
+                <span className="subtitle-line">Productizing Composer</span>
               </h1>
-              <p className="title-desc">Turning LI.FI's Composer/zaps into a first-class widget mode to grow adoption across DeFi protocols, wallets, and chains.</p>
-              <div className="author-info">
-                <div className="author-role">
-                  <span className="role-icon">🎯</span>
-                  <span>PM for Widget/SDK</span>
+              <p className="title-desc">Turning Composer from an infra capability into a simple, discoverable widget mode that unlocks new integrator segments.</p>
+              <div className="overview-box">
+                <div className="overview-item">
+                  <span className="overview-label">Problem</span>
+                  <span className="overview-value">Composer exists but isn't productized — integrators can't easily offer "deposit from any chain" flows</span>
                 </div>
-                <p className="role-focus">Focusing on turning existing infra (routing, Gas.zip, Composer) into productised, low-friction surfaces that integrators can adopt quickly and safely.</p>
+                <div className="overview-item">
+                  <span className="overview-label">Solution</span>
+                  <span className="overview-value">New widget mode where integrators configure DeFi actions by ID, LI.FI handles orchestration</span>
+                </div>
+                <div className="overview-item">
+                  <span className="overview-label">Scope</span>
+                  <span className="overview-value">MVP with 2-3 protocols (Morpho, Aave), 1 design partner, testable in 1-2 cycles</span>
+                </div>
               </div>
             </div>
             <div className="title-visual">
@@ -656,48 +581,53 @@ export default function DeFiActionsDemo() {
 
       case 1:
         return (
-          <div className="slide slide-problem">
+          <div className="slide slide-discovery">
             <div className="slide-header">
               <span className="slide-number">01</span>
-              <h2>Discovery: Problem & Opportunity</h2>
+              <h2>Discovery: The Gap</h2>
             </div>
             <div className="slide-body two-col">
               <div className="col">
-                <div className="problem-card">
-                  <h3><span className="icon-red">⚠️</span> Problem Today</h3>
-                  <p className="lead">The widget is excellent at swap/bridge flows, but:</p>
-                  <ul className="problem-list">
-                    <li>Protocols want <strong>"deposit from any chain in one click"</strong></li>
-                    <li>Wallets want cross-chain DeFi actions without owning complex flows</li>
-                    <li>Composer exists but requires:
-                      <ul>
-                        <li>Knowing vault token addresses</li>
-                        <li>Configuring Composer as a tool</li>
-                        <li>Treating everything as "swap to token"</li>
-                        <li>Managing UX around "weird" vault tokens</li>
-                      </ul>
-                    </li>
+                <div className="discovery-section">
+                  <h3>What Composer Can Do</h3>
+                  <ul className="compact-list">
+                    <li>Bundle multiple on-chain calls into one tx (swap → bridge → deposit)</li>
+                    <li>Execute via LI.FI's on-chain VM + eDSL</li>
+                    <li>Supports Morpho, Aave v3, Euler, Pendle today</li>
+                  </ul>
+                </div>
+                <div className="discovery-section">
+                  <h3>What Integrators Have to Do Today</h3>
+                  <ul className="compact-list numbered">
+                    <li>Know vault token addresses, pass as <code>toToken</code></li>
+                    <li>Enable Composer as a "tool" in routing config</li>
+                    <li>Present flows as "swap to token X" (not "deposit into Morpho")</li>
+                    <li>Build custom UX to explain what's actually happening</li>
                   </ul>
                 </div>
               </div>
               <div className="col">
-                <div className="opportunity-card">
-                  <h3><span className="icon-green">💡</span> Opportunity</h3>
-                  <p className="lead">Leverage Composer to make DeFi actions a <strong>first-class widget mode</strong></p>
-                  <div className="opportunity-points">
-                    <div className="opp-point">
-                      <span className="opp-icon">🎯</span>
-                      <div><strong>Intent-based UX</strong><p>Users choose "Deposit into Morpho", not "swap to vault token"</p></div>
+                <div className="gap-card">
+                  <h3>The Gap</h3>
+                  <p>Composer is <strong>integrated but not productized</strong>.</p>
+                  <div className="gap-points">
+                    <div className="gap-point">
+                      <span className="gap-icon">→</span>
+                      <span>Widget is still a swap/bridge UI — DeFi actions aren't discoverable</span>
                     </div>
-                    <div className="opp-point">
-                      <span className="opp-icon">⚡</span>
-                      <div><strong>Minimal Config</strong><p>Integrators enable actions with simple widget props</p></div>
+                    <div className="gap-point">
+                      <span className="gap-icon">→</span>
+                      <span>Integrators need LI.FI-internal knowledge to use Composer well</span>
                     </div>
-                    <div className="opp-point">
-                      <span className="opp-icon">🛡️</span>
-                      <div><strong>Centralized Safety</strong><p>LI.FI maintains action templates, not each integrator</p></div>
+                    <div className="gap-point">
+                      <span className="gap-icon">→</span>
+                      <span>No self-serve path for protocols/wallets wanting "deposit from any chain"</span>
                     </div>
                   </div>
+                </div>
+                <div className="opportunity-card-v2">
+                  <h3>Opportunity</h3>
+                  <p>Surface Composer flows as <strong>named actions</strong> in the widget. Integrators configure by action ID; LI.FI handles everything else.</p>
                 </div>
               </div>
             </div>
@@ -709,42 +639,117 @@ export default function DeFiActionsDemo() {
           <div className="slide slide-feature">
             <div className="slide-header">
               <span className="slide-number">02</span>
-              <h2>Proposed Feature: DeFi Actions Mode</h2>
+              <h2>Solution: DeFi Actions Mode</h2>
             </div>
-            <div className="slide-body">
-              <div className="feature-intro">
-                <p>Add a new widget mode where each <code>action.id</code> maps to a Composer flow template maintained by LI.FI.</p>
-              </div>
-              <CodeBlock code={`<LiFiWidget
+            <div className="slide-body two-col">
+              <div className="col">
+                <div className="solution-section">
+                  <h3>The Change</h3>
+                  <p className="solution-desc">New widget mode where each <code>actionId</code> maps to a Composer flow maintained by LI.FI.</p>
+                  <CodeBlock code={`<LiFiWidget
   mode="defiActions"
   actions={[
-    { id: 'morpho-usdc-base', label: 'Deposit into Morpho USDC Vault (Base)' },
-    { id: 'aave-usdc-op',    label: 'Deposit into Aave USDC (Optimism)' },
-    { id: 'pendle-steth-arb', label: 'Stake into Pendle stETH Pool (Arbitrum)' }
+    { id: 'morpho-usdc-base' },
+    { id: 'aave-usdc-op' }
   ]}
 />`} />
-              <ComparisonTable />
+                </div>
+                <div className="what-widget-does">
+                  <h4>Widget handles:</h4>
+                  <ul className="compact-list">
+                    <li>Route retrieval via LI.FI API + Composer</li>
+                    <li>Bridge → swap → deposit orchestration</li>
+                    <li>Pre-tx simulation, error states</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="col">
+                <div className="comparison-simple">
+                  <div className="compare-row header">
+                    <span></span>
+                    <span>Today</span>
+                    <span>With DeFi Actions</span>
+                  </div>
+                  <div className="compare-row">
+                    <span>Integrator thinks in</span>
+                    <span>Tokens + tools</span>
+                    <span>User intents</span>
+                  </div>
+                  <div className="compare-row">
+                    <span>Config required</span>
+                    <span>Vault addresses, Composer flags</span>
+                    <span>Action IDs only</span>
+                  </div>
+                  <div className="compare-row">
+                    <span>UX work</span>
+                    <span>Build from scratch</span>
+                    <span>Out of the box</span>
+                  </div>
+                  <div className="compare-row">
+                    <span>Maintenance</span>
+                    <span>Each integrator</span>
+                    <span>LI.FI centrally</span>
+                  </div>
+                </div>
+                <div className="target-users-compact">
+                  <h4>Target integrators:</h4>
+                  <div className="user-tags">
+                    <span className="user-tag">DeFi protocols</span>
+                    <span className="user-tag">Wallets</span>
+                    <span className="user-tag">Chains/ecosystems</span>
+                    <span className="user-tag">Fintech apps</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         );
 
       case 3:
         return (
-          <div className="slide slide-segments">
+          <div className="slide slide-scope">
             <div className="slide-header">
               <span className="slide-number">03</span>
-              <h2>Who It Serves & Why They Care</h2>
+              <h2>Design: MVP Scope</h2>
             </div>
-            <div className="slide-body">
-              <div className="segments-grid">
-                <SegmentCard icon="🏦" title="DeFi Protocols" needs="Want one-click 'deposit from any chain' in their own UI" benefit="Embed via simple widget integration, no routing logic needed" />
-                <SegmentCard icon="👛" title="Wallets" needs="Competing to become 'DeFi superapps' with cross-chain actions" benefit="Expose curated actions with minimal config, no backend required" />
-                <SegmentCard icon="⛓️" title="Chains / Ecosystems" needs="Need onboarding flows: 'bridge + deposit into flagship protocol'" benefit="Ready-made onboarding surface powered by LI.FI" />
-                <SegmentCard icon="📱" title="Fintech / Consumer Apps" needs="Want to offer 'earn' / 'deposit' products without building DeFi infra" benefit="Compliant, encapsulated experience out of the box" />
+            <div className="slide-body two-col">
+              <div className="col">
+                <div className="scope-section">
+                  <h3>In Scope</h3>
+                  <ul className="scope-list">
+                    <li><strong>Chains:</strong> EVM only (Composer constraint)</li>
+                    <li><strong>Protocols:</strong> Morpho, Aave v3 — already supported by Composer</li>
+                    <li><strong>Actions:</strong> Deposit, stake into vaults/pools</li>
+                    <li><strong>Flow:</strong> Select action → configure amount/source → review route → sign 1 tx</li>
+                  </ul>
+                </div>
+                <div className="scope-section">
+                  <h3>Out of Scope (v1)</h3>
+                  <ul className="scope-list muted">
+                    <li>Withdraw, repay, or custom eDSL flows</li>
+                    <li>Non-EVM chains</li>
+                    <li>User-defined actions</li>
+                  </ul>
+                </div>
               </div>
-              <div className="net-effect">
-                <span className="effect-icon">🚀</span>
-                <p><strong>Net Effect:</strong> Turns the widget from a bridge/swap tool into a <em>DeFi entry layer</em>, unlocking new markets beyond current use cases.</p>
+              <div className="col">
+                <div className="behaviour-section">
+                  <h3>User Flow</h3>
+                  <div className="flow-steps">
+                    <div className="flow-step-item"><span className="flow-n">1</span>User selects action (e.g. "Deposit into Morpho USDC on Base")</div>
+                    <div className="flow-step-item"><span className="flow-n">2</span>Chooses amount and source chain/token</div>
+                    <div className="flow-step-item"><span className="flow-n">3</span>Reviews combined route (bridge + swap + deposit)</div>
+                    <div className="flow-step-item"><span className="flow-n">4</span>Signs single transaction</div>
+                  </div>
+                </div>
+                <div className="safety-section">
+                  <h3>Safety</h3>
+                  <ul className="scope-list">
+                    <li>All routes pre-simulated via Composer</li>
+                    <li>Failures surface clear errors, no partial state</li>
+                    <li>Actions curated/whitelisted by LI.FI</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -752,38 +757,64 @@ export default function DeFiActionsDemo() {
 
       case 4:
         return (
-          <div className="slide slide-scope">
+          <div className="slide slide-development">
             <div className="slide-header">
               <span className="slide-number">04</span>
-              <h2>Design: Scope & Behaviour</h2>
+              <h2>Development: Epics</h2>
             </div>
-            <div className="slide-body three-col">
-              <div className="scope-card">
-                <h3>📋 MVP Scope</h3>
-                <ul>
-                  <li><strong>Chains:</strong> EVM-only (Composer limitation)</li>
-                  <li><strong>Protocols:</strong> Morpho, Aave v3, Pendle, 1 restaking</li>
-                  <li><strong>Actions:</strong> Deposit, Stake (no arbitrary calls in v1)</li>
-                  <li><strong>Config:</strong> <code>mode="defiActions"</code> + actionIds</li>
-                </ul>
+            <div className="slide-body">
+              <div className="team-context">
+                <span><strong>Team:</strong> Tech lead + 2 engineers</span>
+                <span><strong>Target:</strong> Testable MVP in 1-2 cycles with design partner</span>
               </div>
-              <div className="scope-card">
-                <h3>⚙️ Behaviour</h3>
-                <ul>
-                  <li>Widget shows "Actions" view (list or cards)</li>
-                  <li>User: select → amount → route details → sign 1 tx</li>
-                  <li>Backend: routing + Composer execution</li>
-                  <li>Clear status & error messages</li>
-                </ul>
+              <div className="epics-grid">
+                <div className="epic-card">
+                  <div className="epic-header">
+                    <span className="epic-num">E1</span>
+                    <h4>Action Registry</h4>
+                  </div>
+                  <ul className="epic-tasks">
+                    <li>Backend: actionId → Composer definition mapping</li>
+                    <li>Admin process for adding/updating actions</li>
+                    <li>Ensure Composer enabled as tool for these routes</li>
+                  </ul>
+                </div>
+                <div className="epic-card">
+                  <div className="epic-header">
+                    <span className="epic-num">E2</span>
+                    <h4>Widget Mode</h4>
+                  </div>
+                  <ul className="epic-tasks">
+                    <li>Implement <code>mode="defiActions"</code></li>
+                    <li>Actions list, configuration, confirmation screens</li>
+                    <li>Handle unsupported chains/assets gracefully</li>
+                  </ul>
+                </div>
+                <div className="epic-card">
+                  <div className="epic-header">
+                    <span className="epic-num">E3</span>
+                    <h4>Routing + Simulation</h4>
+                  </div>
+                  <ul className="epic-tasks">
+                    <li>Ensure API returns appropriate routes via Composer</li>
+                    <li>Integrate simulation results into widget UX</li>
+                    <li>Error handling and recovery</li>
+                  </ul>
+                </div>
+                <div className="epic-card">
+                  <div className="epic-header">
+                    <span className="epic-num">E4</span>
+                    <h4>Docs + Examples</h4>
+                  </div>
+                  <ul className="epic-tasks">
+                    <li>Integration guide for protocols/wallets</li>
+                    <li>Example code snippets</li>
+                    <li>Action catalogue documentation</li>
+                  </ul>
+                </div>
               </div>
-              <div className="scope-card">
-                <h3>👥 Stakeholders</h3>
-                <ul>
-                  <li><strong>Engineering:</strong> Registry, routing changes</li>
-                  <li><strong>Design:</strong> Actions UI, confirmation flow</li>
-                  <li><strong>BD/DevRel:</strong> Design partners, feedback</li>
-                  <li><strong>Protocols:</strong> Validate flows, maintain templates</li>
-                </ul>
+              <div className="pm-role">
+                <strong>PM role:</strong> Tight scope, connect eng to integrator expectations, coordinate with protocol partners (Morpho/Aave) on action definitions.
               </div>
             </div>
           </div>
@@ -791,115 +822,113 @@ export default function DeFiActionsDemo() {
 
       case 5:
         return (
-          <div className="slide slide-development">
+          <div className="slide slide-deployment">
             <div className="slide-header">
               <span className="slide-number">05</span>
-              <h2>Development: Plan & Epics</h2>
+              <h2>Deployment: Rollout</h2>
             </div>
-            <div className="slide-body">
-              <div className="dev-overview">
-                <div className="team-info"><span className="team-icon">👥</span><div><strong>Team:</strong> 3 engineers (1 tech lead, 2 devs)</div></div>
-                <div className="target-info"><span className="target-icon">🎯</span><div><strong>Target:</strong> MVP in ~1–2 cycles with 1–2 protocols via test partner</div></div>
+            <div className="slide-body two-col">
+              <div className="col">
+                <div className="rollout-section-v2">
+                  <h3>Rollout Plan</h3>
+                  <div className="rollout-steps">
+                    <div className="rollout-step">
+                      <span className="rollout-phase">Internal QA</span>
+                      <p>E2E tests across major chains/tokens. Negative tests: invalid inputs, failed simulations.</p>
+                    </div>
+                    <div className="rollout-step">
+                      <span className="rollout-phase">Design Partner Beta</span>
+                      <p>1 protocol (Morpho or Aave) + 1 wallet. Validate integration effort, UX clarity, conversion.</p>
+                    </div>
+                    <div className="rollout-step">
+                      <span className="rollout-phase">Public Launch</span>
+                      <p>Docs update, changelog, announcement. BD/DevRel outreach to target segments.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <Timeline items={[
-                { phase: 'Action Registry & Backend', duration: '2-3 weeks', tasks: ['Data model: actionId → Composer spec + metadata', 'Admin flow for adding/updating actions', 'Safety checks (approved protocols only)'] },
-                { phase: 'Widget Mode & UX', duration: '2-3 weeks', tasks: ['Implement mode="defiActions"', 'Actions list + detail/confirmation UI', 'Handle unsupported contexts gracefully'] },
-                { phase: 'Routing & Composer Integration', duration: '2 weeks', tasks: ['Routing uses Composer flows as primary path', 'Fallback logic when unavailable', 'Error handling & recovery'] },
-                { phase: 'Docs & Examples', duration: '1 week', tasks: ['Quickstart for wallets/protocols', 'Example repos & code snippets', 'Integration guide'] },
-              ]} />
+              <div className="col">
+                <div className="success-section">
+                  <h3>Success Metrics</h3>
+                  <ul className="metrics-list">
+                    <li><span className="metric-label"># integrators</span> using <code>mode="defiActions"</code></li>
+                    <li><span className="metric-label"># actions</span> defined and actively used</li>
+                    <li><span className="metric-label">Volume</span> through DeFi Actions flows</li>
+                    <li><span className="metric-label">Completion rate</span> vs comparable non-Composer flows</li>
+                  </ul>
+                </div>
+                <div className="success-section">
+                  <h3>Qualitative</h3>
+                  <ul className="metrics-list">
+                    <li>Reduction in custom zap integration work</li>
+                    <li>Fewer "how do I build bridge+deposit" support tickets</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         );
 
       case 6:
         return (
-          <div className="slide slide-deployment">
+          <div className="slide slide-strategy">
             <div className="slide-header">
               <span className="slide-number">06</span>
-              <h2>Deployment: Rollout & Success Criteria</h2>
+              <h2>Next Steps</h2>
             </div>
             <div className="slide-body two-col">
               <div className="col">
-                <div className="rollout-section">
-                  <h3>🚀 Rollout Phases</h3>
-                  <div className="rollout-phases">
-                    <div className="phase"><span className="phase-num">1</span><div className="phase-content"><strong>Internal QA</strong><p>Test flows with major chains/tokens, validate error handling</p></div></div>
-                    <div className="phase"><span className="phase-num">2</span><div className="phase-content"><strong>Design Partner Beta</strong><p>1 protocol (Morpho/Aave) + 1 wallet integrator</p></div></div>
-                    <div className="phase"><span className="phase-num">3</span><div className="phase-content"><strong>General Availability</strong><p>Full docs, blog announcement, targeted outreach</p></div></div>
-                  </div>
+                <div className="strategy-section">
+                  <h3>Why This Matters</h3>
+                  <ul className="strategy-list">
+                    <li><strong>Uses existing infra:</strong> Composer VM, eDSL, simulation — no new primitives required</li>
+                    <li><strong>Expands widget positioning:</strong> From swap/bridge tool to DeFi orchestration layer</li>
+                    <li><strong>Aligns with LI.FI narrative:</strong> Intent → execution, across chains, in one action</li>
+                  </ul>
                 </div>
               </div>
               <div className="col">
-                <div className="metrics-section">
-                  <h3>📊 Success Criteria</h3>
-                  <div className="metrics-grid">
-                    <MetricCard label="Integrator Adoption" value="10+" subtext="using defiActions mode" />
-                    <MetricCard label="Protocol Coverage" value="5+" subtext="with published actions" />
-                    <MetricCard label="Cross-chain Volume" value="↑30%" subtext="via DeFi Actions flows" trend="up" />
-                    <MetricCard label="Support Reduction" value="↓50%" subtext="'how to build zap' queries" trend="down" />
-                  </div>
+                <div className="future-section">
+                  <h3>After MVP</h3>
+                  <ul className="future-list">
+                    <li>More actions: withdraw, repay, restake</li>
+                    <li>More protocols as Composer adds support</li>
+                    <li>Non-EVM support when orchestration exists cross-VM</li>
+                    <li>Deeper LI.FI 2.0 integration (solvers, interop standards)</li>
+                    <li>Longer term: action marketplace for vetted protocols</li>
+                  </ul>
                 </div>
               </div>
+            </div>
+            <div className="cta-section">
+              <button className="demo-cta" onClick={() => goToSlide(7)}>
+                <span>See the prototype</span>
+                <span className="arrow">→</span>
+              </button>
             </div>
           </div>
         );
 
       case 7:
         return (
-          <div className="slide slide-strategy">
-            <div className="slide-header">
-              <span className="slide-number">07</span>
-              <h2>Strategic Fit & Next Steps</h2>
-            </div>
-            <div className="slide-body">
-              <div className="strategy-grid">
-                <div className="strategy-card main">
-                  <h3>🎯 Strategic Fit</h3>
-                  <ul className="strategy-points">
-                    <li><strong>Amplifies LI.FI's position</strong> as "intent → execution" infra</li>
-                    <li><strong>Drives widget adoption</strong> into new markets: no longer just bridge/swap</li>
-                    <li><strong>Scales Composer</strong> from bespoke integrations to reusable product surface</li>
-                  </ul>
-                </div>
-                <div className="strategy-card next">
-                  <h3>🔮 After v1</h3>
-                  <ul className="next-steps">
-                    <li><span className="step-icon">📈</span> Expand action catalogue (more protocols, chains)</li>
-                    <li><span className="step-icon">📊</span> Add analytics & recommendations ("most used actions")</li>
-                    <li><span className="step-icon">⚡</span> LI.FI 2.0 integration: solvers, token standards, AA</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="cta-section">
-                <button className="demo-cta" onClick={() => goToSlide(8)}>
-                  <span>See Live Demo</span>
-                  <span className="arrow">→</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 8:
-        return (
           <div className="slide slide-demo">
             <div className="slide-header">
-              <span className="slide-number">08</span>
-              <h2>Live Demo: DeFi Actions Mode</h2>
+              <span className="slide-number">07</span>
+              <h2>Demo</h2>
             </div>
             <div className="slide-body demo-layout">
               <div className="demo-context">
-                <h3>Interactive Prototype</h3>
-                <p>Experience the proposed DeFi Actions Mode flow. Click through the widget to see:</p>
+                <h3>Prototype</h3>
+                <p>Interactive mockup showing the proposed user flow:</p>
                 <ul className="demo-features">
-                  <li><span className="check">✓</span> Curated action selection</li>
-                  <li><span className="check">✓</span> Cross-chain source configuration</li>
-                  <li><span className="check">✓</span> Route preview with cost breakdown</li>
-                  <li><span className="check">✓</span> One-click execution</li>
+                  <li><span className="check">✓</span> Action selection</li>
+                  <li><span className="check">✓</span> Source chain/token configuration</li>
+                  <li><span className="check">✓</span> Route preview + fee breakdown</li>
+                  <li><span className="check">✓</span> Single-tx execution</li>
                 </ul>
                 <div className="demo-note">
-                  <span className="note-icon">💡</span>
-                  <span>This mockup demonstrates the UX flow. Actual implementation would use real LI.FI routing.</span>
+                  <span className="note-icon">ℹ️</span>
+                  <span>UX prototype only — actual implementation would use live LI.FI routing.</span>
                 </div>
               </div>
               <WidgetMockup selectedAction={selectedAction} onSelectAction={setSelectedAction} step={widgetStep} onStepChange={setWidgetStep} />
