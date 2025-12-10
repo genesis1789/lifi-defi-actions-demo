@@ -52,6 +52,9 @@ export default function Home() {
           <span className="logo-text">CrossBridge</span>
         </div>
         <nav className="nav">
+          <Link to="/demo" className="nav-demo">
+            🎯 PM Demo
+          </Link>
           <Link to="/playground" className="nav-playground">
             🎮 Playground
           </Link>
