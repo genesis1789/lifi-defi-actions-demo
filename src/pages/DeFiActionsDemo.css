@@ -224,6 +224,50 @@
   border-radius: 12px;
 }
 
+/* Emphasis Callout */
+.emphasis-callout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--lifi-blue-dim), var(--lifi-pink-dim));
+  border: 1px solid rgba(92, 103, 255, 0.3);
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.emphasis-icon {
+  font-size: 1.25rem;
+}
+
+.emphasis-text {
+  font-size: 0.95rem;
+  color: var(--demo-text-secondary);
+}
+
+.emphasis-text strong {
+  color: var(--lifi-pink);
+}
+
+/* Phase Badge */
+.phase-badge {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 6px;
+  background: var(--demo-surface);
+  color: var(--demo-text-muted);
+}
+
+.phase-badge.emphasized {
+  background: var(--lifi-pink-dim);
+  color: var(--lifi-pink);
+  border: 1px solid rgba(247, 194, 255, 0.3);
+}
+
 /* Overview Box */
 .overview-box {
   text-align: left;
@@ -757,6 +801,178 @@
   margin: 0;
 }
 
+/* --- Blueprint Sections --- */
+.blueprint-section {
+  padding: 1.25rem;
+  background: var(--demo-surface);
+  border-radius: 12px;
+  border: 1px solid var(--demo-border);
+  margin-bottom: 1rem;
+}
+
+.blueprint-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.section-icon {
+  font-size: 1rem;
+}
+
+.section-lead {
+  font-size: 0.9rem;
+  color: var(--demo-text-secondary);
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+.blueprint-section.evidence {
+  background: linear-gradient(135deg, var(--demo-surface), var(--lifi-blue-dim));
+  border-color: rgba(92, 103, 255, 0.2);
+}
+
+.blueprint-section.widget-native {
+  background: linear-gradient(135deg, var(--demo-surface), var(--lifi-pink-dim));
+  border-color: rgba(247, 194, 255, 0.2);
+}
+
+.blueprint-section.widget-native p {
+  font-size: 0.9rem;
+  color: var(--demo-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.blueprint-section.proposal {
+  background: var(--lifi-blue-dim);
+  border-color: rgba(92, 103, 255, 0.25);
+}
+
+.proposal-text {
+  font-size: 0.9rem;
+  color: var(--demo-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Evidence Grid */
+.evidence-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.evidence-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--demo-surface-2);
+  border-radius: 8px;
+}
+
+.evidence-type {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--lifi-blue);
+}
+
+.evidence-detail {
+  font-size: 0.85rem;
+  color: var(--demo-text-secondary);
+}
+
+/* Sizing Grid */
+.sizing-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sizing-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--demo-surface-2);
+  border-radius: 8px;
+}
+
+.sizing-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--lifi-pink);
+}
+
+.sizing-value {
+  font-size: 0.85rem;
+  color: var(--demo-text-secondary);
+}
+
+/* Priority Matrix */
+.priority-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.priority-item {
+  display: grid;
+  grid-template-columns: 80px 60px 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--demo-surface-2);
+  border-radius: 8px;
+}
+
+.priority-factor {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--demo-text);
+}
+
+.priority-rating {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.priority-item.high .priority-rating {
+  background: rgba(0, 212, 170, 0.15);
+  color: var(--demo-success);
+}
+
+.priority-item.medium .priority-rating {
+  background: rgba(255, 184, 0, 0.15);
+  color: var(--demo-warning);
+}
+
+.priority-reason {
+  font-size: 0.8rem;
+  color: var(--demo-text-muted);
+}
+
+.priority-summary {
+  font-size: 0.85rem;
+  color: var(--demo-text-secondary);
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: var(--lifi-pink-dim);
+  border-radius: 6px;
+}
+
 /* --- Solution Slide --- */
 .solution-section {
   margin-bottom: 1rem;
@@ -849,6 +1065,161 @@
   border-radius: 16px;
   font-size: 0.75rem;
   color: var(--demo-text-secondary);
+}
+
+/* --- PRD Sections --- */
+.prd-section {
+  padding: 1.25rem;
+  background: var(--demo-surface);
+  border-radius: 12px;
+  border: 1px solid var(--demo-border);
+  margin-bottom: 1rem;
+}
+
+.prd-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.prd-objective {
+  font-size: 0.9rem;
+  color: var(--demo-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.success-criteria {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.success-criteria li {
+  padding: 0.375rem 0;
+  font-size: 0.85rem;
+  color: var(--demo-text-secondary);
+}
+
+.criteria-metric {
+  font-weight: 600;
+  color: var(--demo-text);
+}
+
+.non-goals {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.non-goals li {
+  padding: 0.375rem 0;
+  font-size: 0.85rem;
+  color: var(--demo-text-muted);
+  padding-left: 1rem;
+  position: relative;
+}
+
+.non-goals li::before {
+  content: "✗";
+  position: absolute;
+  left: 0;
+  color: var(--demo-error);
+}
+
+/* Personas Grid */
+.personas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.persona-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.75rem;
+  background: var(--demo-surface-2);
+  border-radius: 8px;
+}
+
+.persona-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--demo-text);
+}
+
+.persona-jtbd {
+  font-size: 0.75rem;
+  color: var(--demo-text-muted);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Solution Box */
+.prd-section.solution-box {
+  background: var(--lifi-blue-dim);
+  border-color: rgba(92, 103, 255, 0.25);
+}
+
+.solution-summary {
+  font-size: 0.9rem;
+  color: var(--demo-text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.75rem 0;
+}
+
+.solution-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.capability {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.7rem;
+  background: var(--demo-surface);
+  border: 1px solid var(--demo-border);
+  border-radius: 12px;
+  color: var(--demo-text-secondary);
+}
+
+/* Config Section */
+.prd-section.config-section {
+  background: var(--demo-surface);
+}
+
+.prd-section.config-section .code-block {
+  margin: 0;
+}
+
+/* Widget States */
+.widget-states {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.state-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--demo-surface-2);
+  border-radius: 6px;
+}
+
+.state-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--demo-text);
+}
+
+.state-desc {
+  font-size: 0.75rem;
+  color: var(--demo-text-muted);
 }
 
 /* --- Design/Scope Slide --- */
@@ -995,7 +1366,155 @@
   color: var(--demo-text-secondary);
 }
 
+/* PM Involvement Section */
+.pm-involvement-section {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, var(--lifi-pink-dim), var(--lifi-blue-dim));
+  border: 1px solid rgba(247, 194, 255, 0.2);
+  border-radius: 12px;
+}
+
+.pm-involvement-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  color: var(--demo-text);
+}
+
+.pm-tasks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.pm-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--demo-text-secondary);
+  padding: 0.5rem;
+  background: var(--demo-surface);
+  border-radius: 6px;
+}
+
+.pm-task-icon {
+  color: var(--lifi-pink);
+  flex-shrink: 0;
+}
+
 /* --- Deployment Slide --- */
+.deploy-section {
+  padding: 1.25rem;
+  background: var(--demo-surface);
+  border-radius: 12px;
+  border: 1px solid var(--demo-border);
+  margin-bottom: 1rem;
+}
+
+.deploy-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.deploy-section.future {
+  background: linear-gradient(135deg, var(--demo-surface), var(--lifi-blue-dim));
+  border-color: rgba(92, 103, 255, 0.2);
+}
+
+/* Release Phases */
+.release-phases {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.release-phase {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--demo-surface-2);
+  border-radius: 10px;
+}
+
+.release-phase .phase-num {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--demo-gradient);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: white;
+}
+
+.release-phase .phase-content strong {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  color: var(--demo-text);
+}
+
+.release-phase .phase-content p {
+  font-size: 0.8rem;
+  color: var(--demo-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Success Metrics */
+.success-metrics {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.success-metrics li {
+  padding: 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--demo-text-secondary);
+  border-bottom: 1px solid var(--demo-border);
+}
+
+.success-metrics li:last-child {
+  border-bottom: none;
+}
+
+.success-metrics .metric-label {
+  font-weight: 600;
+  color: var(--demo-text);
+}
+
+/* Future Items */
+.future-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.future-items li {
+  padding: 0.375rem 0;
+  font-size: 0.85rem;
+  color: var(--demo-text-secondary);
+  padding-left: 1rem;
+  position: relative;
+}
+
+.future-items li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--lifi-blue);
+}
+
 .rollout-section-v2 {
   padding: 1.25rem;
   background: var(--demo-surface);
@@ -2755,6 +3274,7 @@
     padding: 0.5rem 0;
   }
 }
+
 
 
 
