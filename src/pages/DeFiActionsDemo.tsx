@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import './DeFiActionsDemo.css';
 
-// === Li.Fi Logo Components ===
 function LiFiLogoIcon({ className = '', size = 24 }: { className?: string; size?: number }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 64 64" fill="none" className={className}>
@@ -21,14 +20,15 @@ interface DeFiAction {
   chainId: number;
   icon: string;
   color: string;
+  outputToken: string;
+  outputDescription: string;
 }
 
-// === Data ===
 const DEFI_ACTIONS: DeFiAction[] = [
-  { id: 'morpho-usdc-base', label: 'Deposit USDC into Morpho', protocol: 'Morpho', type: 'deposit', chain: 'Base', chainId: 8453, icon: '🔵', color: '#0052FF' },
-  { id: 'aave-usdc-op', label: 'Deposit USDC into Aave', protocol: 'Aave', type: 'deposit', chain: 'Optimism', chainId: 10, icon: '👻', color: '#B6509E' },
-  { id: 'pendle-pteeth-arb', label: 'Stake PT-eETH via Pendle', protocol: 'Pendle', type: 'stake', chain: 'Arbitrum', chainId: 42161, icon: '🔮', color: '#00D395' },
-  { id: 'compound-usdc-eth', label: 'Deposit USDC into Compound', protocol: 'Compound', type: 'deposit', chain: 'Ethereum', chainId: 1, icon: '⚡', color: '#00D9FF' },
+  { id: 'morpho-usdc-base', label: 'Deposit USDC into Morpho', protocol: 'Morpho', type: 'deposit', chain: 'Base', chainId: 8453, icon: '🔵', color: '#0052FF', outputToken: 'mUSDC', outputDescription: 'Morpho vault shares' },
+  { id: 'aave-usdc-op', label: 'Deposit USDC into Aave', protocol: 'Aave', type: 'deposit', chain: 'Optimism', chainId: 10, icon: '👻', color: '#B6509E', outputToken: 'aOptUSDC', outputDescription: 'Aave lending position' },
+  { id: 'pendle-pteeth-arb', label: 'Stake PT-eETH via Pendle', protocol: 'Pendle', type: 'stake', chain: 'Arbitrum', chainId: 42161, icon: '🔮', color: '#00D395', outputToken: 'PT-eETH', outputDescription: 'Pendle principal token' },
+  { id: 'compound-usdc-eth', label: 'Deposit USDC into Compound', protocol: 'Compound', type: 'deposit', chain: 'Ethereum', chainId: 1, icon: '⚡', color: '#00D9FF', outputToken: 'cUSDCv3', outputDescription: 'Compound market position' },
 ];
 
 const CHAINS = [
@@ -58,7 +58,6 @@ const SLIDES = [
   { id: 'gtm', label: 'GTM' },
 ];
 
-// === Code Block ===
 function CodeBlock({ code }: { code: string }) {
   return (
     <div className="code-block">
@@ -71,7 +70,6 @@ function CodeBlock({ code }: { code: string }) {
   );
 }
 
-// === Interactive Widget Mockup ===
 function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
   selectedAction: DeFiAction | null;
   onSelectAction: (action: DeFiAction | null) => void;
@@ -117,7 +115,6 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
     return num.toFixed(2);
   };
 
-  // Determine if we need extra steps (swap if not USDC for USDC actions, bridge if cross-chain)
   const needsSwap = sourceToken.symbol !== 'USDC' && selectedAction?.label.toLowerCase().includes('usdc');
   const needsBridge = selectedAction && sourceChain.name !== selectedAction.chain;
   
@@ -125,14 +122,14 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
     const steps: { title: string; subtitle: string; icon: string; status?: string }[] = [];
     
     if (needsSwap) {
-      steps.push({ title: `Swap ${sourceToken.symbol} → USDC`, subtitle: `On ${sourceChain.name}`, icon: '🔄' });
+      steps.push({ title: `Swap ${sourceToken.symbol} → USDC`, subtitle: `Via LI.FI routing`, icon: '🔄' });
     }
     if (needsBridge && selectedAction) {
       steps.push({ title: `Bridge to ${selectedAction.chain}`, subtitle: 'Via Stargate • ~2 min', icon: '🌉' });
     }
     if (selectedAction) {
-      const actionVerb = selectedAction.type === 'deposit' ? 'Deposit into' : 'Stake in';
-      steps.push({ title: `${actionVerb} ${selectedAction.protocol}`, subtitle: 'Receive position tokens', icon: selectedAction.icon });
+      const actionVerb = selectedAction.type === 'deposit' ? 'Deposit into' : 'Stake via';
+      steps.push({ title: `${actionVerb} ${selectedAction.protocol}`, subtitle: `Receive ${selectedAction.outputToken}`, icon: selectedAction.icon });
     }
     return steps;
   };
@@ -143,7 +140,6 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
   const handleReview = () => {
     setIsSimulating(true);
     setSimulationComplete(false);
-    // Simulate pre-execution check
     setTimeout(() => {
       setIsSimulating(false);
       setSimulationComplete(true);
@@ -155,7 +151,6 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
     setIsProcessing(true);
     setProcessingStep(0);
     
-    // Animate through each step
     const stepDuration = 1200;
     executionSteps.forEach((_, idx) => {
       setTimeout(() => {
@@ -163,7 +158,6 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
       }, stepDuration * (idx + 1));
     });
     
-    // Complete after all steps
     setTimeout(() => {
       setIsProcessing(false);
       setProcessingStep(0);
@@ -187,12 +181,11 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
     return num > 0 && num <= balance;
   };
 
-  // Calculate output amount (with small fee deduction for realism)
   const getOutputAmount = (): string => {
     const num = parseFloat(amount.replace(/,/g, '') || '0');
     let output = num;
     if (needsSwap && sourceToken.symbol === 'ETH') {
-      output = num * 2150 * 0.997; // ETH → USDC conversion
+      output = num * 2150 * 0.997;
     } else {
       output = num * 0.997;
     }
@@ -296,7 +289,6 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
                 </div>
               </div>
               
-              {/* Smart route preview */}
               {isValidAmount() && (needsSwap || needsBridge) && (
                 <div className="route-preview">
                   <span className="route-preview-label">Route includes:</span>
@@ -326,7 +318,6 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
                 )}
               </div>
               
-              {/* Execution steps */}
               <div className="route-steps">
                 {executionSteps.map((execStep, idx) => (
                   <div key={idx} className={`route-step-item ${isProcessing && processingStep > idx ? 'completed' : ''} ${isProcessing && processingStep === idx ? 'active' : ''}`}>
@@ -342,19 +333,17 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
                 ))}
               </div>
               
-              {/* Outcome summary */}
               <div className="outcome-summary">
                 <div className="outcome-row">
-                  <span className="outcome-label">You deposit</span>
+                  <span className="outcome-label">You pay</span>
                   <span className="outcome-value">{formatNumber(amount)} {sourceToken.symbol}</span>
                 </div>
                 <div className="outcome-row highlight">
                   <span className="outcome-label">You receive</span>
-                  <span className="outcome-value">{formatNumber(getOutputAmount())} {selectedAction.protocol} Position</span>
+                  <span className="outcome-value">~{formatNumber(getOutputAmount())} {selectedAction.outputToken}</span>
                 </div>
               </div>
               
-              {/* Info cards */}
               <div className="info-cards two-col">
                 <div className="info-card">
                   <span className="info-label">Est. Time</span>
@@ -368,18 +357,17 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
                 </div>
               </div>
               
-              {/* Security badge */}
               <div className="security-badge">
                 <span className="shield-icon">🛡️</span>
                 <div className="security-text">
-                  <span className="security-title">Pre-execution verified</span>
-                  <span className="security-subtitle">Route simulated • Outcome guaranteed</span>
+                  <span className="security-title">Pre-execution simulation passed</span>
+                  <span className="security-subtitle">Audited contracts • Verified outcome</span>
                 </div>
               </div>
               
               <button className={`widget-cta execute ${isProcessing ? 'processing' : ''}`} onClick={handleExecute} disabled={isProcessing}>
                 {isProcessing ? (
-                  <><span className="spinner"></span>{executionSteps[processingStep]?.title || 'Finalizing...'}</>
+                  <><span className="spinner"></span>{processingStep < totalSteps ? `Step ${processingStep + 1} of ${totalSteps}...` : 'Confirming...'}</>
                 ) : `Confirm ${selectedAction.type === 'deposit' ? 'Deposit' : 'Stake'}`}
               </button>
             </div>
@@ -389,26 +377,23 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
         {step === 'success' && selectedAction && (
           <div className="widget-content success-state">
             <div className="success-icon">✓</div>
-            <h3 className="success-title">Position Acquired!</h3>
-            <p className="success-desc">You now have a position in {selectedAction.protocol} on {selectedAction.chain}.</p>
+            <h3 className="success-title">{selectedAction.type === 'deposit' ? 'Deposit' : 'Stake'} Complete</h3>
+            <p className="success-desc">{selectedAction.outputDescription} on {selectedAction.chain}</p>
             <div className="success-details">
               <div className="detail-row">
-                <span>Position</span>
-                <span className="highlight">{formatNumber(getOutputAmount())} {selectedAction.protocol}</span>
+                <span>Received</span>
+                <span className="highlight">~{formatNumber(getOutputAmount())} {selectedAction.outputToken}</span>
               </div>
               <div className="detail-row">
-                <span>Chain</span>
-                <span>{selectedAction.chain}</span>
+                <span>Protocol</span>
+                <span>{selectedAction.protocol}</span>
               </div>
               <div className="detail-row">
                 <span>Status</span>
-                <span className="highlight">Active</span>
+                <span className="highlight">Confirmed</span>
               </div>
             </div>
-            <div className="success-actions">
-              <button className="widget-cta" onClick={resetWidget}>New Action</button>
-              <button className="widget-cta secondary">View Position ↗</button>
-            </div>
+            <button className="widget-cta" onClick={resetWidget}>Done</button>
           </div>
         )}
 
@@ -420,7 +405,6 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
   );
 }
 
-// === Slide Indicator ===
 function SlideIndicator({ activeSlide }: { activeSlide: string }) {
   const scrollToSlide = (slideId: string) => {
     const element = document.getElementById(slideId);
@@ -441,7 +425,6 @@ function SlideIndicator({ activeSlide }: { activeSlide: string }) {
   );
 }
 
-// === Main Component ===
 export default function DeFiActionsDemo() {
   const [selectedAction, setSelectedAction] = useState<DeFiAction | null>(null);
   const [widgetStep, setWidgetStep] = useState<'select' | 'configure' | 'review' | 'success'>('select');
@@ -449,7 +432,6 @@ export default function DeFiActionsDemo() {
   const [activeSlide, setActiveSlide] = useState('hero');
   const mainRef = useRef<HTMLElement>(null);
 
-  // Handle scroll progress and active slide detection
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -457,7 +439,6 @@ export default function DeFiActionsDemo() {
       const progress = (scrollTop / docHeight) * 100;
       setScrollProgress(Math.min(100, Math.max(0, progress)));
 
-      // Detect active slide
       const sections = SLIDES.map(s => document.getElementById(s.id)).filter(Boolean);
       for (let i = sections.length - 1; i >= 0; i--) {
         const section = sections[i];
@@ -493,7 +474,7 @@ export default function DeFiActionsDemo() {
         <section id="hero" className="section section-hero">
           <div className="hero-layout">
             <div className="hero-content">
-              <div className="section-number">01 — Hero</div>
+              <div className="section-number">01 - Hero</div>
               <h1 className="hero-title">
                 LI.FI Widget: <em>DeFi Actions</em> Mode
               </h1>
@@ -523,7 +504,7 @@ export default function DeFiActionsDemo() {
 
               <div className="hero-outcome">
                 <span className="outcome-label">Why this matters</span>
-                <p>It expands Widget adoption into onboarding use cases for wallets, protocols, and appchains — not just routing.</p>
+                <p>It expands Widget adoption into onboarding use cases for wallets, protocols, and appchains, not just routing.</p>
               </div>
 
               <button className="try-prototype-btn" onClick={scrollToWidget}>
@@ -548,7 +529,7 @@ export default function DeFiActionsDemo() {
         {/* === SECTION 02: CONTEXT === */}
         <section id="context" className="section section-context">
           <div className="section-inner">
-            <div className="section-number">02 — Context: Where This Fits in LI.FI</div>
+            <div className="section-number">02 - Context: Where This Fits in LI.FI</div>
             <h2 className="section-title">What exists today</h2>
 
             <div className="stack-grid">
@@ -582,7 +563,7 @@ export default function DeFiActionsDemo() {
 
             <div className="mental-model-grid">
               <div className="model-box old">
-                <span className="model-label">In practical terms — Before</span>
+                <span className="model-label">In practical terms: Before</span>
                 <div className="model-title">users think in tokens and routes</div>
               </div>
               <div className="model-arrow">→</div>
@@ -607,7 +588,7 @@ export default function DeFiActionsDemo() {
                 <span className="shift-arrow">to</span>
                 <span className="shift-to">the execution engine behind explicit, user-facing actions</span>
               </div>
-              <p className="opportunity-note">— without changing the underlying infrastructure.</p>
+              <p className="opportunity-note">Without changing the underlying infrastructure.</p>
             </div>
           </div>
         </section>
@@ -615,8 +596,8 @@ export default function DeFiActionsDemo() {
         {/* === SECTION 03: PROBLEM === */}
         <section id="problem" className="section section-problem">
           <div className="section-inner">
-            <div className="section-number">03 — Discovery: The Real Problem</div>
-            <h2 className="section-title">The problem is not execution — it's abstraction</h2>
+            <div className="section-number">03 - Discovery: The Real Problem</div>
+            <h2 className="section-title">The problem is not execution, it's abstraction</h2>
 
             <div className="problem-statement">
               <p>Composer can already execute complex, multi-step flows.</p>
@@ -646,7 +627,7 @@ export default function DeFiActionsDemo() {
         {/* === SECTION 04: WHO FEELS THIS FIRST === */}
         <section id="segments" className="section section-segments">
           <div className="section-inner">
-            <div className="section-number">04 — Who Feels This First (v1 Focus)</div>
+            <div className="section-number">04 - Who Feels This First (v1 Focus)</div>
             
             <div className="segments-grid">
               <div className="segment-card">
@@ -682,7 +663,7 @@ export default function DeFiActionsDemo() {
         {/* === SECTION 05: COMPETITIVE LANDSCAPE === */}
         <section id="landscape" className="section section-landscape">
           <div className="section-inner">
-            <div className="section-number">05 — Discovery: Validation & Competitive Landscape</div>
+            <div className="section-number">05 - Discovery: Validation & Competitive Landscape</div>
             
             <div className="landscape-split">
               <div className="validation-section">
@@ -734,11 +715,11 @@ export default function DeFiActionsDemo() {
         {/* === SECTION 06: PROPOSAL === */}
         <section id="proposal" className="section section-proposal">
           <div className="section-inner">
-            <div className="section-number">06 — Proposal: DeFi Actions Mode</div>
+            <div className="section-number">06 - Proposal: DeFi Actions Mode</div>
             <h2 className="section-title">What it is</h2>
 
             <div className="proposal-intro">
-              <p>A new Widget mode that surfaces curated DeFi actions — outcomes users understand.</p>
+              <p>A new Widget mode that surfaces curated DeFi actions, outcomes users understand.</p>
               <p className="proposal-examples-label">Examples (illustrative):</p>
               <ul className="action-examples">
                 <li>Deposit USDC into Morpho</li>
@@ -807,7 +788,7 @@ export default function DeFiActionsDemo() {
         {/* === SECTION 07: IMPACT === */}
         <section id="impact" className="section section-impact">
           <div className="section-inner">
-            <div className="section-number">07 — Expected Impact (Transparent Assumptions)</div>
+            <div className="section-number">07 - Expected Impact (Transparent Assumptions)</div>
             
             <div className="impact-comparison">
               <div className="impact-before">
@@ -853,7 +834,7 @@ export default function DeFiActionsDemo() {
         {/* === SECTION 08: PRD SNAPSHOT === */}
         <section id="prd" className="section section-prd">
           <div className="section-inner">
-            <div className="section-number">08 — Design Principles & v1 Scope</div>
+            <div className="section-number">08 - Design Principles & v1 Scope</div>
             
             <div className="design-principle">
               <span className="principle-label">Design principle</span>
@@ -889,7 +870,7 @@ export default function DeFiActionsDemo() {
         {/* === SECTION 09: RISKS === */}
         <section id="risks" className="section section-risks">
           <div className="section-inner">
-            <div className="section-number">09 — Risks & Mitigations</div>
+            <div className="section-number">09 - Risks & Mitigations</div>
 
             <div className="risks-table">
               <div className="risk-row">
@@ -915,7 +896,7 @@ export default function DeFiActionsDemo() {
         {/* === SECTION 10: GTM & SUCCESS === */}
         <section id="gtm" className="section section-gtm">
           <div className="section-inner">
-            <div className="section-number">10 — Development, Rollout & Success</div>
+            <div className="section-number">10 - Development, Rollout & Success</div>
             
             <div className="epics-section">
               <h3>Epics</h3>
@@ -984,7 +965,7 @@ export default function DeFiActionsDemo() {
 
             <div className="closing-section">
               <span className="closing-label">Closing</span>
-              <p>DeFi Actions Mode doesn't replace routing — it builds on it. It turns Composer from execution capability into clear product value and moves the LI.FI Widget toward an intent-driven onboarding surface.</p>
+              <p>DeFi Actions Mode doesn't replace routing, it builds on it. It turns Composer from execution capability into clear product value and moves the LI.FI Widget toward an intent-driven onboarding surface.</p>
             </div>
           </div>
         </section>
@@ -992,3 +973,4 @@ export default function DeFiActionsDemo() {
     </div>
   );
 }
+

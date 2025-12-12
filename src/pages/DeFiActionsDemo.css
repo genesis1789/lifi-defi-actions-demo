@@ -1,12 +1,12 @@
-/* === LI.FI DeFi Actions Mode — Presentation Landing Page === */
-/* A distinctive, slide-based design for maximum clarity */
+/* LI.FI DeFi Actions Mode - Presentation Landing Page */
+/* Slide-based design for clarity */
 
-/* --- Typography: LI.FI Brand Fonts --- */
-/* GT America for headlines (commercial font - requires license) */
-/* Inter for body text (Google Fonts) */
+/* Typography */
+/* GT America for headlines (requires license) */
+/* Inter for body text */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* GT America font-face declarations - add your licensed font files */
+/* GT America font-face declarations */
 @font-face {
   font-family: 'GT America';
   src: local('GT America Regular'), local('GTAmerica-Regular');
@@ -31,16 +31,16 @@
   font-display: swap;
 }
 
-/* --- Design Tokens --- */
+/* Design Tokens */
 :root {
-  /* Brand — Deep violet with warm accents */
+  /* Brand colors */
   --violet: #7C5CFC;
   --violet-light: #A78BFA;
   --violet-dark: #5B3FD9;
   --coral: #FF6B6B;
   --mint: #6FEDD6;
   
-  /* Surfaces — Rich, warm blacks */
+  /* Surface colors */
   --bg-deep: #08080A;
   --bg-0: #0C0C0F;
   --bg-1: #121216;
@@ -48,7 +48,7 @@
   --bg-3: #242430;
   --bg-4: #2E2E3A;
   
-  /* Text — Warm white spectrum */
+  /* Text colors */
   --text-100: #FAFAF9;
   --text-90: #F0F0EE;
   --text-70: #A8A8A4;
@@ -72,7 +72,7 @@
   --warning: #FFBF47;
   --error: #FF6B6B;
   
-  /* Typography — LI.FI Brand */
+  /* Typography */
   --font-display: 'GT America', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
@@ -81,7 +81,7 @@
   --content-max: 1280px;
   --content-narrow: 900px;
   
-  /* Spacing — Plan specified values */
+  /* Spacing scale */
   --sp-1: 4px;
   --sp-2: 8px;
   --sp-3: 12px;
@@ -96,13 +96,10 @@
   --sp-24: 96px;
   --sp-30: 120px;
   
-  /* Section spacing per plan: 96-120px between sections */
+  /* Section spacing */
   --section-gap: var(--sp-24);
-  /* Section title to content: 32-48px */
   --title-gap: var(--sp-8);
-  /* Between content blocks: 24-32px */
   --block-gap: var(--sp-6);
-  /* Within cards: 16-20px padding */
   --card-padding: var(--sp-5);
   
   /* Radius */
@@ -114,7 +111,7 @@
   --r-full: 9999px;
 }
 
-/* --- Reset & Base --- */
+/* Reset & Base */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -136,13 +133,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* === LANDING PAGE === */
+/* Landing Page */
 .landing-page {
   min-height: 100vh;
   position: relative;
 }
 
-/* === SCROLL PROGRESS === */
+/* Scroll Progress */
 .scroll-progress {
   position: fixed;
   top: 0;
@@ -159,7 +156,7 @@ body {
   transition: width 0.15s ease-out;
 }
 
-/* === SLIDE INDICATOR === */
+/* Slide Indicator */
 .slide-indicator {
   position: fixed;
   right: var(--sp-8);
@@ -210,12 +207,12 @@ body {
   opacity: 1;
 }
 
-/* === MAIN CONTENT === */
+/* Main Content */
 .main-content {
   width: 100%;
 }
 
-/* === SECTIONS (SLIDES) === */
+/* Sections */
 .section {
   min-height: 100vh;
   padding: var(--section-gap) var(--sp-10);
@@ -231,7 +228,7 @@ body {
   width: 100%;
 }
 
-/* Section Numbers - Per plan: mono font, violet accent */
+/* Section Numbers */
 .section-number {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -263,10 +260,7 @@ body {
   margin-bottom: var(--title-gap);
 }
 
-/* ============================================
-   SECTION 01: HERO
-   Goal: User grasps "what is new" and "why it matters" in 5-10 seconds
-   ============================================ */
+/* Section 01: Hero */
 .section-hero {
   min-height: 100vh;
   padding: var(--sp-20) var(--sp-10); /* Increased top padding */
@@ -536,10 +530,7 @@ body {
   opacity: 0.6;
 }
 
-/* ============================================
-   SECTION 02: CONTEXT
-   Goal: Ground the idea in LI.FI's existing architecture
-   ============================================ */
+/* Section 02: Context */
 .section-context {
   background: var(--bg-0);
   padding: var(--sp-20) var(--sp-10);
@@ -935,11 +926,7 @@ body {
   margin-bottom: var(--sp-2);
 }
 
-/* ============================================
-   SECTION 03: PROBLEM
-   Goal: Create empathy. Show the problem is real and felt.
-   Style: High-precision "System Status" aesthetic.
-   ============================================ */
+/* Section 03: Problem */
 .section-problem {
   background: var(--bg-deep);
   padding: var(--sp-24) var(--sp-10);
@@ -1178,11 +1165,7 @@ body {
   }
 }
 
-/* ============================================
-   SECTION 04: SEGMENTS
-   Goal: Segment-specific empathy. Prove demand is real.
-   Style: "Target Verticals" / System Architecture Nodes
-   ============================================ */
+/* Section 04: Segments */
 .section-segments {
   background: var(--bg-0);
   padding: var(--sp-24) var(--sp-10);
@@ -1277,11 +1260,7 @@ body {
   margin-top: var(--sp-4);
 }
 
-/* ============================================
-   SECTION 05: LANDSCAPE
-   Goal: Show market gap without over-claiming.
-   Style: "Data Terminal" / Market Analysis
-   ============================================ */
+/* Section 05: Landscape */
 .section-landscape {
   background: var(--bg-deep);
   padding: var(--sp-24) var(--sp-10);
@@ -1435,11 +1414,7 @@ body {
   margin: 0;
 }
 
-/* ============================================
-   SECTION 06: PROPOSAL
-   Goal: Make the solution concrete and tangible.
-   Style: "Action Registry" / API Documentation
-   ============================================ */
+/* Section 06: Proposal */
 .section-proposal {
   background: var(--bg-0);
   padding: var(--sp-24) var(--sp-10);
@@ -1722,11 +1697,7 @@ body {
   color: var(--text-50);
 }
 
-/* ============================================
-   SECTION 07: IMPACT
-   Goal: Justify the investment. Show effort reduction.
-   Style: "Efficiency Dashboard"
-   ============================================ */
+/* Section 07: Impact */
 .section-impact {
   background: var(--bg-deep);
   padding: var(--sp-24) var(--sp-10);
@@ -2038,10 +2009,7 @@ body {
   }
 }
 
-/* ============================================
-   SECTION 08: PRD
-   Goal: Show product rigor. Signal this is scoped and safe.
-   ============================================ */
+/* Section 08: PRD */
 .section-prd {
   background: var(--bg-0);
 }
@@ -2132,11 +2100,7 @@ body {
   color: var(--violet-light);
 }
 
-/* ============================================
-   SECTION 09: RISKS
-   Goal: Show complexity is understood. Build trust.
-   Style: "System Health / Diagnostics"
-   ============================================ */
+/* Section 09: Risks */
 .section-risks {
   background: var(--bg-deep);
   padding: var(--sp-24) var(--sp-10);
@@ -2218,11 +2182,7 @@ body {
   padding-top: 0;
 }
 
-/* ============================================
-   SECTION 10: GTM
-   Goal: Close with execution credibility and outcomes
-   Style: "Mission Control / Roadmap"
-   ============================================ */
+/* Section 10: GTM */
 .section-gtm {
   background: var(--bg-0);
   padding: var(--sp-24) var(--sp-10);
@@ -2475,9 +2435,7 @@ body {
   }
 }
 
-/* ============================================
-   CODE BLOCK
-   ============================================ */
+/* Code Block */
 .code-block {
   border-radius: var(--r-lg);
   overflow: hidden;
@@ -2521,9 +2479,7 @@ body {
   color: var(--text-70);
 }
 
-/* ============================================
-   WIDGET MOCKUP
-   ============================================ */
+/* Widget Mockup */
 .widget-mockup {
   display: flex;
   justify-content: center;
@@ -3198,7 +3154,7 @@ body {
   color: var(--text-50);
 }
 
-/* === Enhanced Widget Elements === */
+/* Enhanced Widget Elements */
 
 /* Route preview in configure step */
 .route-preview {
@@ -3329,31 +3285,13 @@ body {
   50% { box-shadow: 0 0 0 8px rgba(124, 92, 252, 0); }
 }
 
-/* Success actions (two buttons) */
-.success-actions {
-  display: flex;
-  gap: var(--sp-3);
+/* Success state button */
+.success-state .widget-cta {
   width: 100%;
+  margin-top: var(--sp-2);
 }
 
-.success-actions .widget-cta {
-  flex: 1;
-}
-
-.success-actions .widget-cta.secondary {
-  background: transparent;
-  border: 1px solid var(--border-default);
-  color: var(--text-90);
-}
-
-.success-actions .widget-cta.secondary:hover {
-  border-color: var(--border-violet);
-  color: var(--text-100);
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+/* Responsive */
 @media (max-width: 1200px) {
   .slide-indicator {
     display: none;
