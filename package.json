@@ -1,7 +1,8 @@
 {
-  "name": "lifi-test-integration",
+  "name": "lifi-defi-actions-demo",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "DeFi Actions Mode presentation and interactive prototype for LI.FI Widget",
   "type": "module",
   "scripts": {
     "dev": "vite",

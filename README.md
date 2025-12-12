@@ -1,24 +1,25 @@
-# CrossBridge - Li.Fi Widget Integration Demo
+# LI.FI Widget - DeFi Actions Mode
 
-A beautifully crafted demo showcasing the integration of the [Li.Fi Widget](https://docs.li.fi/widget/overview) for cross-chain token swaps and bridges.
+A presentation and interactive prototype for **DeFi Actions Mode**, a new Widget mode that surfaces curated DeFi actions as outcomes users understand.
 
-![CrossBridge Demo](./screenshot.png)
+## Overview
+
+This project presents a product proposal for evolving the LI.FI Widget from token-level routing to outcome-level intent. DeFi Actions Mode enables users to choose what they want to do (e.g., "Deposit USDC into Aave") while LI.FI handles how it happens through Composer-powered execution.
 
 ## Features
 
-- 🌉 **Li.Fi Widget Integration** - Full cross-chain bridging capabilities
-- 🎨 **Custom Dark Theme** - Professional DeFi-inspired design
-- ⚡ **Vite + React + TypeScript** - Modern, fast development stack
-- 📱 **Responsive Design** - Works on all screen sizes
-- 🔗 **Multi-Chain Support** - Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BSC
+- **Interactive Prototype**: Fully functional widget mockup demonstrating the DeFi Actions Mode experience
+- **Smart Route Detection**: Automatically shows required steps (swap, bridge) based on user selection
+- **Pre-execution Simulation**: Visual feedback showing route verification before execution
+- **Step-by-step Processing**: Animated execution flow showing orchestrated multi-step transactions
+- **Outcome-focused UX**: Clear display of what users receive (position tokens, not just confirmation)
 
 ## Tech Stack
 
-- **Framework**: React 18 with TypeScript
+- **Framework**: React 19 with TypeScript
 - **Build Tool**: Vite 7
-- **Widget**: `@lifi/widget` v3.36+
-- **Styling**: Custom CSS with CSS variables
-- **Font**: Outfit (Google Fonts)
+- **Styling**: Custom CSS with design tokens
+- **Fonts**: GT America (display), Inter (body), JetBrains Mono (mono)
 
 ## Quick Start
 
@@ -36,62 +37,48 @@ npm run build
 npm run preview
 ```
 
-## Widget Configuration
-
-The Li.Fi widget is configured in `src/App.tsx`:
-
-```typescript
-const widgetConfig: WidgetConfig = {
-  integrator: 'CrossBridge Demo',
-  variant: 'compact',
-  appearance: 'dark',
-  theme: {
-    palette: {
-      primary: { main: '#14f4c9' },
-      secondary: { main: '#0ea5e9' },
-      background: {
-        default: '#111827',
-        paper: '#1a2235',
-      },
-    },
-    // ... additional theme options
-  },
-  chains: {
-    allow: [1, 137, 42161, 10, 8453, 43114, 56],
-  },
-};
-```
-
-### Configuration Options
-
-| Option | Description |
-|--------|-------------|
-| `integrator` | Your app/company name for analytics |
-| `variant` | Widget layout: `compact`, `wide`, or `drawer` |
-| `appearance` | Theme mode: `light`, `dark`, or `auto` |
-| `theme` | Custom theming (colors, typography, etc.) |
-| `chains.allow` | Array of chain IDs to enable |
-
 ## Project Structure
 
 ```
 ├── src/
-│   ├── App.tsx        # Main component with Li.Fi widget
-│   ├── App.css        # Component styles
-│   ├── main.tsx       # Entry point with providers
-│   └── index.css      # Global styles & CSS variables
-├── index.html         # HTML template
+│   ├── pages/
+│   │   ├── DeFiActionsDemo.tsx    # Main presentation component
+│   │   └── DeFiActionsDemo.css    # Presentation styles
+│   ├── App.tsx                    # App wrapper
+│   └── main.tsx                   # Entry point
+├── index.html
 ├── package.json
-└── vite.config.ts
+└── README.md
 ```
 
-## Resources
+## Presentation Sections
 
-- [Li.Fi Widget Documentation](https://docs.li.fi/widget/overview)
-- [Widget Configuration Guide](https://docs.li.fi/integrate-li.fi-widget/configure-widget)
-- [Theme Customization](https://docs.li.fi/integrate-li.fi-widget/customize-widget)
-- [Widget Variants](https://docs.li.fi/integrate-li.fi-widget/select-widget-variants)
-- [Li.Fi GitHub](https://github.com/lifinance/widget)
+1. **Hero**: Introduction to DeFi Actions Mode
+2. **Context**: Where this fits in LI.FI's architecture
+3. **Problem**: The abstraction gap, not execution
+4. **Segments**: Target users (wallets, protocols, appchains)
+5. **Landscape**: Market validation and competitive analysis
+6. **Proposal**: How DeFi Actions Mode works
+7. **Impact**: Expected effort reduction for partners
+8. **PRD**: Design principles and v1 scope
+9. **Risks**: Identified risks and mitigations
+10. **GTM**: Development roadmap and success criteria
+
+## Interactive Prototype
+
+The prototype demonstrates:
+- Action selection (4 curated DeFi actions)
+- Cross-chain capability (automatic bridge detection)
+- Token flexibility (swap detection when needed)
+- Pre-execution simulation
+- Multi-step execution visualization
+- Outcome-focused success states
+
+## Design Principles
+
+- **Users choose outcomes**: The Widget explains the action clearly
+- **System handles complexity**: Execution orchestration is abstracted
+- **Clean, modern, fintech aesthetic**: Lean design focused on clarity
 
 ## License
 
