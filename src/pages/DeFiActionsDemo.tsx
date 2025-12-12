@@ -27,7 +27,7 @@ interface DeFiAction {
 const DEFI_ACTIONS: DeFiAction[] = [
   { id: 'morpho-usdc-base', label: 'Deposit USDC into Morpho', protocol: 'Morpho', type: 'deposit', chain: 'Base', chainId: 8453, icon: '🔵', color: '#0052FF', outputToken: 'mUSDC', outputDescription: 'Morpho vault shares' },
   { id: 'aave-usdc-op', label: 'Deposit USDC into Aave', protocol: 'Aave', type: 'deposit', chain: 'Optimism', chainId: 10, icon: '👻', color: '#B6509E', outputToken: 'aOptUSDC', outputDescription: 'Aave lending position' },
-  { id: 'pendle-pteeth-arb', label: 'Stake PT-eETH via Pendle', protocol: 'Pendle', type: 'stake', chain: 'Arbitrum', chainId: 42161, icon: '🔮', color: '#00D395', outputToken: 'PT-eETH', outputDescription: 'Pendle principal token' },
+  { id: 'lido-eth-eth', label: 'Stake ETH via Lido', protocol: 'Lido', type: 'stake', chain: 'Ethereum', chainId: 1, icon: '🌊', color: '#00A3FF', outputToken: 'stETH', outputDescription: 'Lido staked ETH position' },
   { id: 'compound-usdc-eth', label: 'Deposit USDC into Compound', protocol: 'Compound', type: 'deposit', chain: 'Ethereum', chainId: 1, icon: '⚡', color: '#00D9FF', outputToken: 'cUSDCv3', outputDescription: 'Compound market position' },
 ];
 
@@ -115,14 +115,17 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
     return num.toFixed(2);
   };
 
-  const needsSwap = sourceToken.symbol !== 'USDC' && selectedAction?.label.toLowerCase().includes('usdc');
+  const isUsdcAction = selectedAction?.label.toLowerCase().includes('usdc');
+  const isEthAction = selectedAction?.label.toLowerCase().includes('eth') && selectedAction?.type === 'stake';
+  const needsSwap = (isUsdcAction && sourceToken.symbol !== 'USDC') || (isEthAction && sourceToken.symbol !== 'ETH');
   const needsBridge = selectedAction && sourceChain.name !== selectedAction.chain;
   
   const getExecutionSteps = () => {
     const steps: { title: string; subtitle: string; icon: string; status?: string }[] = [];
+    const targetToken = isEthAction ? 'ETH' : 'USDC';
     
     if (needsSwap) {
-      steps.push({ title: `Swap ${sourceToken.symbol} → USDC`, subtitle: `Via LI.FI routing`, icon: '🔄' });
+      steps.push({ title: `Swap ${sourceToken.symbol} → ${targetToken}`, subtitle: `Via LI.FI routing`, icon: '🔄' });
     }
     if (needsBridge && selectedAction) {
       steps.push({ title: `Bridge to ${selectedAction.chain}`, subtitle: 'Via Stargate • ~2 min', icon: '🌉' });
@@ -184,12 +187,22 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
   const getOutputAmount = (): string => {
     const num = parseFloat(amount.replace(/,/g, '') || '0');
     let output = num;
-    if (needsSwap && sourceToken.symbol === 'ETH') {
-      output = num * 2150 * 0.997;
+    
+    if (isEthAction) {
+      if (sourceToken.symbol === 'ETH') {
+        output = num * 0.997;
+      } else {
+        output = (num / 2150) * 0.997;
+      }
+      return output.toFixed(4);
     } else {
-      output = num * 0.997;
+      if (sourceToken.symbol === 'ETH') {
+        output = num * 2150 * 0.997;
+      } else {
+        output = num * 0.997;
+      }
+      return output.toFixed(2);
     }
-    return output.toFixed(2);
   };
 
   return (
@@ -293,7 +306,7 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
                 <div className="route-preview">
                   <span className="route-preview-label">Route includes:</span>
                   <div className="route-preview-items">
-                    {needsSwap && <span className="route-tag swap">Swap to USDC</span>}
+                    {needsSwap && <span className="route-tag swap">Swap to {isEthAction ? 'ETH' : 'USDC'}</span>}
                     {needsBridge && <span className="route-tag bridge">Bridge to {selectedAction.chain}</span>}
                   </div>
                 </div>
@@ -736,7 +749,7 @@ export default function DeFiActionsDemo() {
               <ul className="action-examples">
                 <li>Deposit USDC into Morpho</li>
                 <li>Deposit USDC into Aave</li>
-                <li>Stake PT-eETH via Pendle</li>
+                <li>Stake ETH via Lido</li>
                 <li>Deposit USDC into Compound</li>
               </ul>
               <p className="action-note">Each action is a stable abstraction over a Composer-powered execution flow.</p>
