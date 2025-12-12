@@ -554,7 +554,7 @@ export default function DeFiActionsDemo() {
             </div>
 
             <div className="direction-flow">
-              <span className="direction-label">Strategic direction (clarified)</span>
+              <span className="direction-label">Strategic direction</span>
               <div className="direction-steps">
                 <span className="direction-step">From token-level routing</span>
                 <span className="direction-arrow">→</span>
@@ -611,7 +611,7 @@ export default function DeFiActionsDemo() {
               <p>To expose a clean, user-understandable DeFi action (e.g. "Deposit into protocol X"), partners typically still need to:</p>
               <div className="burden-list">
                 <div className="burden-item"><span>1</span>Define and maintain protocol-specific action parameters (e.g. vault token addresses, target contracts, position semantics)</div>
-                <div className="burden-item"><span>2</span>Integrate beyond the default Widget surface (often via SDK/API usage or LI.FI-assisted setup)</div>
+                <div className="burden-item"><span>2</span>Integrate beyond the default Widget surface (often involving SDK/API usage or additional LI.FI coordination)</div>
                 <div className="burden-item"><span>3</span>Design outcome-first UX and copy ("what will happen", "what you receive", "what can fail")</div>
               </div>
             </div>
