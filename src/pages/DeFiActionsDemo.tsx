@@ -896,7 +896,7 @@ export default function DeFiActionsDemo() {
               <ul className="questions-list">
                 <li>How much context the Widget vs. the partner app should own for explaining protocol risks</li>
                 <li>Whether actions should be globally standardized or partner-scoped over time</li>
-                <li>How to expose exits/unwinds safely without breaking the mental model</li>
+                <li>How to expose exits/unwinds safely without breaking the users' mental model</li>
               </ul>
             </div>
           </div>
