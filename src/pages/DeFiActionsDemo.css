@@ -1226,29 +1226,30 @@ body {
   position: relative;
 }
 
-/* Segments Grid - "Node" Layout */
 .segments-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px; /* Minimal gap for border effect */
-  background: var(--border-subtle); /* creates the border lines */
+  gap: 1px;
+  background: var(--border-subtle);
   border: 1px solid var(--border-subtle);
   margin-bottom: var(--sp-12);
+  align-items: stretch;
 }
 
 .segment-card {
   padding: var(--sp-8);
-  background: var(--bg-0); /* Inner background */
+  background: var(--bg-0);
   position: relative;
   transition: background 0.2s ease;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .segment-card:hover {
   background: var(--bg-1);
 }
 
-/* Header as a "Node ID" */
 .segment-card h4 {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1256,10 +1257,11 @@ body {
   color: var(--violet-light);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: var(--sp-6);
+  margin-bottom: var(--sp-8);
   display: flex;
   align-items: center;
   gap: var(--sp-2);
+  flex-shrink: 0;
 }
 
 .segment-card h4::before {
@@ -1269,27 +1271,41 @@ body {
 }
 
 .segment-row {
-  padding: var(--sp-3) 0;
+  padding: var(--sp-5) 0;
   border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  flex: 1;
 }
 
 .segment-row:last-child {
   border-bottom: none;
+  padding-bottom: 0;
+}
+
+.segment-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-50);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: block;
   margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.segment-row:last-child .segment-label {
+  color: var(--coral);
 }
 
 .segment-row p {
   font-size: 14px;
   color: var(--text-90);
   margin: 0;
-  line-height: 1.5;
-}
-
-/* Second row (pain point) styling - more muted */
-.segment-row:nth-child(even) p {
-  color: var(--text-50);
-  font-size: 13px;
+  line-height: 1.6;
+  flex: 1;
 }
 
 /* Hover effect highlights the active vertical */
@@ -1345,6 +1361,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
+  counter-reset: list-item;
 }
 
 .validation-list li {
@@ -1355,11 +1372,11 @@ body {
   color: var(--text-70);
   line-height: 1.5;
   border: none;
+  counter-increment: list-item;
 }
 
 .validation-list li::before {
-  content: "0" counter(list-item) " "; /* Numbered steps */
-  counter-increment: list-item;
+  content: counter(list-item, decimal-leading-zero) " ";
   position: absolute;
   left: 0;
   top: 1px;
@@ -1367,10 +1384,6 @@ body {
   font-size: 10px;
   color: var(--violet-light);
   font-weight: 700;
-}
-
-.validation-list {
-  counter-reset: list-item;
 }
 
 /* Landscape Table - "Trading Terminal" Data Grid */

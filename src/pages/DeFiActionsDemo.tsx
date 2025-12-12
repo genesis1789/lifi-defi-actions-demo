@@ -636,25 +636,34 @@ export default function DeFiActionsDemo() {
               <div className="segment-card">
                 <h4>Wallets</h4>
                 <div className="segment-row">
-                  <p>Users expect more than swaps</p>
+                  <span className="segment-label">User expectation</span>
+                  <p>Use DeFi directly from the wallet, not just swap and bridge</p>
                 </div>
                 <div className="segment-row">
-                  <p>Teams want deeper engagement without custom DeFi UX</p>
+                  <span className="segment-label">Team pain</span>
+                  <p>Need deeper user engagement without building and maintaining custom DeFi onboarding UX</p>
                 </div>
               </div>
               <div className="segment-card">
                 <h4>Protocols</h4>
                 <div className="segment-row">
-                  <p>Want "Deposit from any chain" on their own site</p>
+                  <span className="segment-label">User expectation</span>
+                  <p>Deposit into the protocol from any chain, in one flow</p>
                 </div>
                 <div className="segment-row">
-                  <p>Lose users during multi-step onboarding</p>
+                  <span className="segment-label">Team pain</span>
+                  <p>Lose users during multi-step onboarding (bridge → swap → deposit)</p>
                 </div>
               </div>
               <div className="segment-card">
                 <h4>Appchains / L2s</h4>
                 <div className="segment-row">
-                  <p>Need turnkey onboarding into key apps on day one</p>
+                  <span className="segment-label">User expectation</span>
+                  <p>Bridge in and start using core applications immediately</p>
+                </div>
+                <div className="segment-row">
+                  <span className="segment-label">Team pain</span>
+                  <p>Need turnkey onboarding flows to activate the ecosystem from day one</p>
                 </div>
               </div>
             </div>
@@ -680,7 +689,7 @@ export default function DeFiActionsDemo() {
               </div>
 
               <div className="competitive-section">
-                <h3>Competitive landscape (light)</h3>
+                <h3>Competitive landscape</h3>
                 <p className="landscape-disclaimer">Based on public documentation; intentionally high-level.</p>
                 
                 <div className="landscape-table">
