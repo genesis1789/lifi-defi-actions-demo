@@ -2186,7 +2186,9 @@ body {
   color: var(--text-100);
   margin-bottom: var(--sp-6);
   line-height: 1.4;
-  flex: 1; /* Push mitigation to bottom */
+  height: 90px; /* Fixed height to ensure divider alignment */
+  display: flex;
+  align-items: flex-start;
 }
 
 /* Mitigation styling */
@@ -2202,8 +2204,9 @@ body {
   border-top: 1px solid rgba(255, 107, 107, 0.15);
   width: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--sp-2);
+  line-height: 1.5;
 }
 
 .risk-mitigation::before {
@@ -2211,6 +2214,8 @@ body {
   font-weight: 700;
   color: var(--mint);
   margin-right: var(--sp-1);
+  flex-shrink: 0;
+  padding-top: 0;
 }
 
 /* ============================================
@@ -2372,8 +2377,20 @@ body {
   border-radius: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  height: 140px;
+  min-height: 160px;
+  height: 100%;
+}
+
+.success-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--mint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-4);
+  display: block;
+  flex-shrink: 0;
 }
 
 .success-item p {
@@ -2384,6 +2401,7 @@ body {
   line-height: 1.5;
   border-left: 2px solid var(--mint);
   padding-left: var(--sp-3);
+  flex: 1;
 }
 
 /* Closing Section - "The Verdict" */
@@ -3178,6 +3196,159 @@ body {
 .powered-by {
   font-size: 11px;
   color: var(--text-50);
+}
+
+/* === Enhanced Widget Elements === */
+
+/* Route preview in configure step */
+.route-preview {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-1);
+  border-radius: var(--r-md);
+  margin-bottom: var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.route-preview-label {
+  font-size: 11px;
+  color: var(--text-50);
+  font-weight: 500;
+}
+
+.route-preview-items {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.route-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.route-tag.swap {
+  background: var(--accent-violet);
+  color: var(--violet-light);
+}
+
+.route-tag.bridge {
+  background: rgba(255, 191, 71, 0.15);
+  color: var(--warning);
+}
+
+/* Simulation badge in review header */
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.simulation-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--mint);
+  padding: 4px 10px;
+  background: var(--accent-mint);
+  border-radius: var(--r-sm);
+  letter-spacing: 0.03em;
+}
+
+/* Outcome summary in review */
+.outcome-summary {
+  background: var(--bg-1);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.outcome-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sp-2) 0;
+  font-size: 14px;
+}
+
+.outcome-row:not(:last-child) {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+.outcome-label {
+  color: var(--text-50);
+}
+
+.outcome-value {
+  color: var(--text-100);
+  font-weight: 500;
+}
+
+.outcome-row.highlight .outcome-value {
+  color: var(--mint);
+  font-weight: 600;
+}
+
+/* Step states during processing */
+.route-step-item.completed .step-number {
+  background: var(--mint);
+  border-color: var(--mint);
+}
+
+.route-step-item.completed .step-title {
+  color: var(--text-50);
+}
+
+.route-step-item.completed .step-status {
+  background: var(--accent-mint) !important;
+  color: var(--mint);
+}
+
+.route-step-item.active {
+  background: rgba(124, 92, 252, 0.08);
+  margin: 0 calc(-1 * var(--sp-4));
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+}
+
+.route-step-item.active .step-number {
+  background: var(--violet);
+  border-color: var(--violet);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(124, 92, 252, 0); }
+}
+
+/* Success actions (two buttons) */
+.success-actions {
+  display: flex;
+  gap: var(--sp-3);
+  width: 100%;
+}
+
+.success-actions .widget-cta {
+  flex: 1;
+}
+
+.success-actions .widget-cta.secondary {
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-90);
+}
+
+.success-actions .widget-cta.secondary:hover {
+  border-color: var(--border-violet);
+  color: var(--text-100);
 }
 
 /* ============================================

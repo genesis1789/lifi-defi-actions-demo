@@ -25,9 +25,10 @@ interface DeFiAction {
 
 // === Data ===
 const DEFI_ACTIONS: DeFiAction[] = [
-  { id: 'morpho-usdc-base', label: 'Deposit into Morpho USDC Vault', protocol: 'Morpho', type: 'deposit', chain: 'Base', chainId: 8453, icon: '🔵', color: '#0052FF' },
-  { id: 'aave-usdc-op', label: 'Deposit USDC into Aave on Optimism', protocol: 'Aave', type: 'deposit', chain: 'Optimism', chainId: 10, icon: '👻', color: '#B6509E' },
-  { id: 'pendle-steth-arb', label: 'Stake PT-eETH via Pendle', protocol: 'Pendle', type: 'stake', chain: 'Arbitrum', chainId: 42161, icon: '🔮', color: '#00D395' },
+  { id: 'morpho-usdc-base', label: 'Deposit USDC into Morpho', protocol: 'Morpho', type: 'deposit', chain: 'Base', chainId: 8453, icon: '🔵', color: '#0052FF' },
+  { id: 'aave-usdc-op', label: 'Deposit USDC into Aave', protocol: 'Aave', type: 'deposit', chain: 'Optimism', chainId: 10, icon: '👻', color: '#B6509E' },
+  { id: 'pendle-pteeth-arb', label: 'Stake PT-eETH via Pendle', protocol: 'Pendle', type: 'stake', chain: 'Arbitrum', chainId: 42161, icon: '🔮', color: '#00D395' },
+  { id: 'compound-usdc-eth', label: 'Deposit USDC into Compound', protocol: 'Compound', type: 'deposit', chain: 'Ethereum', chainId: 1, icon: '⚡', color: '#00D9FF' },
 ];
 
 const CHAINS = [
@@ -81,8 +82,11 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
   const [sourceChainIndex, setSourceChainIndex] = useState(0);
   const [sourceTokenIndex, setSourceTokenIndex] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStep, setProcessingStep] = useState(0);
   const [showChainDropdown, setShowChainDropdown] = useState(false);
   const [showTokenDropdown, setShowTokenDropdown] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simulationComplete, setSimulationComplete] = useState(false);
 
   const sourceChain = CHAINS[sourceChainIndex];
   const sourceToken = TOKENS[sourceTokenIndex];
@@ -113,12 +117,58 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
     return num.toFixed(2);
   };
 
+  // Determine if we need extra steps (swap if not USDC for USDC actions, bridge if cross-chain)
+  const needsSwap = sourceToken.symbol !== 'USDC' && selectedAction?.label.toLowerCase().includes('usdc');
+  const needsBridge = selectedAction && sourceChain.name !== selectedAction.chain;
+  
+  const getExecutionSteps = () => {
+    const steps: { title: string; subtitle: string; icon: string; status?: string }[] = [];
+    
+    if (needsSwap) {
+      steps.push({ title: `Swap ${sourceToken.symbol} → USDC`, subtitle: `On ${sourceChain.name}`, icon: '🔄' });
+    }
+    if (needsBridge && selectedAction) {
+      steps.push({ title: `Bridge to ${selectedAction.chain}`, subtitle: 'Via Stargate • ~2 min', icon: '🌉' });
+    }
+    if (selectedAction) {
+      const actionVerb = selectedAction.type === 'deposit' ? 'Deposit into' : 'Stake in';
+      steps.push({ title: `${actionVerb} ${selectedAction.protocol}`, subtitle: 'Receive position tokens', icon: selectedAction.icon });
+    }
+    return steps;
+  };
+
+  const executionSteps = getExecutionSteps();
+  const totalSteps = executionSteps.length;
+
+  const handleReview = () => {
+    setIsSimulating(true);
+    setSimulationComplete(false);
+    // Simulate pre-execution check
+    setTimeout(() => {
+      setIsSimulating(false);
+      setSimulationComplete(true);
+      onStepChange('review');
+    }, 800);
+  };
+
   const handleExecute = () => {
     setIsProcessing(true);
+    setProcessingStep(0);
+    
+    // Animate through each step
+    const stepDuration = 1200;
+    executionSteps.forEach((_, idx) => {
+      setTimeout(() => {
+        setProcessingStep(idx + 1);
+      }, stepDuration * (idx + 1));
+    });
+    
+    // Complete after all steps
     setTimeout(() => {
       setIsProcessing(false);
+      setProcessingStep(0);
       onStepChange('success');
-    }, 2000);
+    }, stepDuration * totalSteps + 500);
   };
 
   const resetWidget = () => {
@@ -127,12 +177,26 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
     setAmount('');
     setShowChainDropdown(false);
     setShowTokenDropdown(false);
+    setSimulationComplete(false);
+    setProcessingStep(0);
   };
 
   const isValidAmount = (): boolean => {
     const num = parseFloat(amount.replace(/,/g, '') || '0');
     const balance = parseFloat(sourceToken.balance.replace(/,/g, ''));
     return num > 0 && num <= balance;
+  };
+
+  // Calculate output amount (with small fee deduction for realism)
+  const getOutputAmount = (): string => {
+    const num = parseFloat(amount.replace(/,/g, '') || '0');
+    let output = num;
+    if (needsSwap && sourceToken.symbol === 'ETH') {
+      output = num * 2150 * 0.997; // ETH → USDC conversion
+    } else {
+      output = num * 0.997;
+    }
+    return output.toFixed(2);
   };
 
   return (
@@ -180,7 +244,7 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
             </div>
             <div className="widget-form">
               <div className="form-group">
-                <label>From</label>
+                <label>Pay with</label>
                 <div className="input-row">
                   <div className="select-wrapper">
                     <div className="chain-select" onClick={() => { setShowChainDropdown(!showChainDropdown); setShowTokenDropdown(false); }}>
@@ -231,8 +295,22 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
                   {amount && <span className="usd-value">≈ ${formatNumber(getUsdValue())}</span>}
                 </div>
               </div>
-              <button className="widget-cta" onClick={() => onStepChange('review')} disabled={!isValidAmount()}>
-                {!amount ? 'Enter Amount' : !isValidAmount() ? 'Insufficient Balance' : `Review ${selectedAction.type === 'deposit' ? 'Deposit' : 'Stake'}`}
+              
+              {/* Smart route preview */}
+              {isValidAmount() && (needsSwap || needsBridge) && (
+                <div className="route-preview">
+                  <span className="route-preview-label">Route includes:</span>
+                  <div className="route-preview-items">
+                    {needsSwap && <span className="route-tag swap">Swap to USDC</span>}
+                    {needsBridge && <span className="route-tag bridge">Bridge to {selectedAction.chain}</span>}
+                  </div>
+                </div>
+              )}
+              
+              <button className="widget-cta" onClick={handleReview} disabled={!isValidAmount() || isSimulating}>
+                {isSimulating ? (
+                  <><span className="spinner"></span>Simulating...</>
+                ) : !amount ? 'Enter Amount' : !isValidAmount() ? 'Insufficient Balance' : `Review ${selectedAction.type === 'deposit' ? 'Deposit' : 'Stake'}`}
               </button>
             </div>
           </div>
@@ -241,56 +319,68 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
         {step === 'review' && selectedAction && (
           <div className="widget-content review-content">
             <div className="review-section">
-              <div className="review-header">Review Transaction</div>
-              <div className="route-steps">
-                <div className="route-step-item">
-                  <div className="step-number">1</div>
-                  <div className="step-details">
-                    <span className="step-title">Send {formatNumber(amount)} {sourceToken.symbol}</span>
-                    <span className="step-subtitle">From {sourceChain.name}</span>
-                  </div>
-                  <span className="step-status">⟠</span>
-                </div>
-                {sourceChain.name !== selectedAction.chain && (
-                  <div className="route-step-item">
-                    <div className="step-number">2</div>
-                    <div className="step-details">
-                      <span className="step-title">Bridge to {selectedAction.chain}</span>
-                      <span className="step-subtitle">Via Stargate • ~2 min</span>
-                    </div>
-                    <span className="step-status bridge">🌉</span>
-                  </div>
+              <div className="review-header">
+                <span>Review Transaction</span>
+                {simulationComplete && (
+                  <span className="simulation-badge">✓ Simulated</span>
                 )}
-                <div className="route-step-item">
-                  <div className="step-number">{sourceChain.name !== selectedAction.chain ? '3' : '2'}</div>
-                  <div className="step-details">
-                    <span className="step-title">{selectedAction.type === 'deposit' ? 'Deposit into' : 'Stake in'} {selectedAction.protocol}</span>
-                    <span className="step-subtitle">Receive vault tokens</span>
+              </div>
+              
+              {/* Execution steps */}
+              <div className="route-steps">
+                {executionSteps.map((execStep, idx) => (
+                  <div key={idx} className={`route-step-item ${isProcessing && processingStep > idx ? 'completed' : ''} ${isProcessing && processingStep === idx ? 'active' : ''}`}>
+                    <div className="step-number">{idx + 1}</div>
+                    <div className="step-details">
+                      <span className="step-title">{execStep.title}</span>
+                      <span className="step-subtitle">{execStep.subtitle}</span>
+                    </div>
+                    <span className="step-status" style={idx === executionSteps.length - 1 ? { background: selectedAction.color } : undefined}>
+                      {isProcessing && processingStep > idx ? '✓' : execStep.icon}
+                    </span>
                   </div>
-                  <span className="step-status" style={{ background: selectedAction.color }}>{selectedAction.icon}</span>
+                ))}
+              </div>
+              
+              {/* Outcome summary */}
+              <div className="outcome-summary">
+                <div className="outcome-row">
+                  <span className="outcome-label">You deposit</span>
+                  <span className="outcome-value">{formatNumber(amount)} {sourceToken.symbol}</span>
+                </div>
+                <div className="outcome-row highlight">
+                  <span className="outcome-label">You receive</span>
+                  <span className="outcome-value">{formatNumber(getOutputAmount())} {selectedAction.protocol} Position</span>
                 </div>
               </div>
+              
+              {/* Info cards */}
               <div className="info-cards two-col">
                 <div className="info-card">
-                  <span className="info-label">You Receive</span>
-                  <span className="info-value">{formatNumber((parseFloat(amount.replace(/,/g, '') || '0') * 0.997).toFixed(2))}</span>
-                  <span className="info-unit">{selectedAction.protocol} LP</span>
-                </div>
-                <div className="info-card">
                   <span className="info-label">Est. Time</span>
-                  <span className="info-value">{sourceChain.name !== selectedAction.chain ? '~3' : '~1'}</span>
+                  <span className="info-value">{needsBridge ? '~3' : '~1'}</span>
                   <span className="info-unit">minutes</span>
                 </div>
+                <div className="info-card">
+                  <span className="info-label">Network Cost</span>
+                  <span className="info-value">~$2.40</span>
+                  <span className="info-unit">estimated</span>
+                </div>
               </div>
+              
+              {/* Security badge */}
               <div className="security-badge">
                 <span className="shield-icon">🛡️</span>
                 <div className="security-text">
-                  <span className="security-title">Protected by LI.FI</span>
-                  <span className="security-subtitle">Audited routes • Pre-simulated execution</span>
+                  <span className="security-title">Pre-execution verified</span>
+                  <span className="security-subtitle">Route simulated • Outcome guaranteed</span>
                 </div>
               </div>
+              
               <button className={`widget-cta execute ${isProcessing ? 'processing' : ''}`} onClick={handleExecute} disabled={isProcessing}>
-                {isProcessing ? (<><span className="spinner"></span>Processing...</>) : `Confirm ${selectedAction.type === 'deposit' ? 'Deposit' : 'Stake'}`}
+                {isProcessing ? (
+                  <><span className="spinner"></span>{executionSteps[processingStep]?.title || 'Finalizing...'}</>
+                ) : `Confirm ${selectedAction.type === 'deposit' ? 'Deposit' : 'Stake'}`}
               </button>
             </div>
           </div>
@@ -299,14 +389,26 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
         {step === 'success' && selectedAction && (
           <div className="widget-content success-state">
             <div className="success-icon">✓</div>
-            <h3 className="success-title">Transaction Successful!</h3>
-            <p className="success-desc">Your {amount} {sourceToken.symbol} has been {selectedAction.type === 'deposit' ? 'deposited into' : 'staked in'} {selectedAction.protocol}.</p>
+            <h3 className="success-title">Position Acquired!</h3>
+            <p className="success-desc">You now have a position in {selectedAction.protocol} on {selectedAction.chain}.</p>
             <div className="success-details">
-              <div className="detail-row"><span>Protocol</span><span>{selectedAction.protocol}</span></div>
-              <div className="detail-row"><span>Chain</span><span>{selectedAction.chain}</span></div>
-              <div className="detail-row"><span>Status</span><span className="highlight">Confirmed</span></div>
+              <div className="detail-row">
+                <span>Position</span>
+                <span className="highlight">{formatNumber(getOutputAmount())} {selectedAction.protocol}</span>
+              </div>
+              <div className="detail-row">
+                <span>Chain</span>
+                <span>{selectedAction.chain}</span>
+              </div>
+              <div className="detail-row">
+                <span>Status</span>
+                <span className="highlight">Active</span>
+              </div>
             </div>
-            <button className="widget-cta secondary" onClick={resetWidget}>New Action</button>
+            <div className="success-actions">
+              <button className="widget-cta" onClick={resetWidget}>New Action</button>
+              <button className="widget-cta secondary">View Position ↗</button>
+            </div>
           </div>
         )}
 
@@ -639,9 +741,10 @@ export default function DeFiActionsDemo() {
               <p>A new Widget mode that surfaces curated DeFi actions — outcomes users understand.</p>
               <p className="proposal-examples-label">Examples (illustrative):</p>
               <ul className="action-examples">
-                <li>Deposit USDC into Aave on Optimism</li>
-                <li>Deposit into Morpho USDC Vault on Base</li>
+                <li>Deposit USDC into Morpho</li>
+                <li>Deposit USDC into Aave</li>
                 <li>Stake PT-eETH via Pendle</li>
+                <li>Deposit USDC into Compound</li>
               </ul>
               <p className="action-note">Each action is a stable abstraction over a Composer-powered execution flow.</p>
             </div>
@@ -791,19 +894,19 @@ export default function DeFiActionsDemo() {
             <div className="risks-table">
               <div className="risk-row">
                 <span className="risk-name">Protocol changes break actions</span>
-                <span className="risk-mitigation">versioning, deprecation, monitoring</span>
+                <span className="risk-mitigation">versioned Action Registry, explicit deprecation, active monitoring</span>
               </div>
               <div className="risk-row">
                 <span className="risk-name">Simulation inconsistency across chains</span>
-                <span className="risk-mitigation">limited v1 scope, explicit failure UX</span>
+                <span className="risk-mitigation">limited v1 scope, explicit pre-execution failure UX (no silent fallback)</span>
               </div>
               <div className="risk-row">
-                <span className="risk-name">Too many actions dilute UX</span>
-                <span className="risk-mitigation">small curated v1 set</span>
+                <span className="risk-name">Too many actions dilute Widget UX</span>
+                <span className="risk-mitigation">small, curated v1 action set</span>
               </div>
               <div className="risk-row">
-                <span className="risk-name">Scope creep into automation platform</span>
-                <span className="risk-mitigation">deposit-only v1 boundary</span>
+                <span className="risk-name">Scope creep into an automation platform</span>
+                <span className="risk-mitigation">Deposit-only, user-initiated execution;no scheduled, conditional, or recurring actions.</span>
               </div>
             </div>
           </div>
@@ -858,19 +961,23 @@ export default function DeFiActionsDemo() {
             </div>
 
             <div className="success-section">
-              <h3>Success criteria (targets, not promises)</h3>
+              <h3>Success criteria</h3>
               <div className="success-grid">
                 <div className="success-item">
-                  <p>adoption by initial integrators within the release window</p>
+                  <span className="success-label">Adoption</span>
+                  <p>DeFi Actions Mode is enabled by design partners and additional integrators within the first release cycle</p>
                 </div>
                 <div className="success-item">
-                  <p>expansion by existing Widget partners into onboarding use cases</p>
+                  <span className="success-label">Expansion</span>
+                  <p>Existing Widget partners adopt DeFi Actions to support new onboarding use cases</p>
                 </div>
                 <div className="success-item">
-                  <p>integration effort validated at ≤ 1 day per action</p>
+                  <span className="success-label">Integration effort</span>
+                  <p>Partner-reported setup time for a new action validates at ≤ 1 day during beta</p>
                 </div>
                 <div className="success-item">
-                  <p>fewer onboarding-related support issues</p>
+                  <span className="success-label">Operational signal</span>
+                  <p>Reduced support questions related to cross-chain onboarding compared to manual Composer-based setups</p>
                 </div>
               </div>
             </div>
