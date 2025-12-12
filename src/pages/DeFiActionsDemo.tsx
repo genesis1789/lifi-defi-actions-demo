@@ -514,7 +514,10 @@ export default function DeFiActionsDemo() {
 
             <div className="hero-widget">
               <div className="widget-sticky">
-                <span className="widget-label">Interactive Prototype</span>
+                <div className="widget-cta-label">
+                  <span className="widget-cta-text">Click to interact</span>
+                  <span className="widget-cta-arrow">↓</span>
+                </div>
                 <WidgetMockup
                   selectedAction={selectedAction}
                   onSelectAction={setSelectedAction}
