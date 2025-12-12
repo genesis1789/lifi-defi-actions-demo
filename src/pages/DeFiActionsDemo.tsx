@@ -852,6 +852,7 @@ export default function DeFiActionsDemo() {
             <div className="impact-why">
               <span className="why-label">Why this matters</span>
               <p>Composer's execution power becomes repeatable adoption leverage for the Widget.</p>
+              <p className="business-note">In the near term, DeFi Actions Mode primarily drives Widget expansion and retention; monetization can follow existing routing fee structures or be revisited once action adoption and usage patterns are validated.</p>
             </div>
           </div>
         </section>
@@ -889,6 +890,15 @@ export default function DeFiActionsDemo() {
                 </ul>
               </div>
             </div>
+
+            <div className="open-questions">
+              <h4>Open Questions (intentionally deferred)</h4>
+              <ul className="questions-list">
+                <li>How much context the Widget vs. the partner app should own for explaining protocol risks</li>
+                <li>Whether actions should be globally standardized or partner-scoped over time</li>
+                <li>How to expose exits/unwinds safely without breaking the mental model</li>
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -912,8 +922,18 @@ export default function DeFiActionsDemo() {
               </div>
               <div className="risk-row">
                 <span className="risk-name">Scope creep into an automation platform</span>
-                <span className="risk-mitigation">Deposit-only, user-initiated execution;no scheduled, conditional, or recurring actions.</span>
+                <span className="risk-mitigation">Deposit-only, user-initiated execution; no scheduled, conditional, or recurring actions.</span>
               </div>
+            </div>
+
+            <div className="ownership-section">
+              <h4>Ownership & Responsibility (v1)</h4>
+              <ul className="ownership-list">
+                <li><strong>LI.FI guarantees</strong> correct orchestration and transparent failure handling of the execution flow.</li>
+                <li><strong>LI.FI does not guarantee</strong> economic outcomes (APY, rewards, protocol behavior).</li>
+                <li><strong>Partners remain responsible</strong> for how actions are presented in their product context and for any protocol-specific disclosures.</li>
+                <li><strong>The Widget explicitly surfaces</strong> "what can fail" and halts execution if guarantees cannot be met.</li>
+              </ul>
             </div>
           </div>
         </section>
