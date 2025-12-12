@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import './DeFiActionsDemo.css';
 
 // === Li.Fi Logo Components ===
@@ -30,38 +30,34 @@ interface DeFiAction {
   type: 'deposit' | 'stake' | 'repay';
   chain: string;
   chainId: number;
-  apy?: string;
-  tvl?: string;
   icon: string;
   color: string;
 }
 
-interface Slide {
-  id: number;
-  title: string;
-  subtitle?: string;
-  phase?: string;
+interface Section {
+  id: string;
+  label: string;
+  shortLabel: string;
 }
 
 // === Data ===
-const SLIDES: Slide[] = [
-  { id: 0, title: 'DeFi Actions Mode', subtitle: 'Composer-Powered', phase: 'title' },
-  { id: 1, title: 'Discovery', subtitle: 'The Real Problem', phase: 'discovery' },
-  { id: 2, title: 'Discovery', subtitle: 'Commercial Impact', phase: 'discovery' },
-  { id: 3, title: 'Solution', subtitle: 'DeFi Actions Mode', phase: 'solution' },
-  { id: 4, title: 'Analysis', subtitle: 'Why The Gap Exists', phase: 'analysis' },
-  { id: 5, title: 'Design', subtitle: 'PRD Snapshot', phase: 'design' },
-  { id: 6, title: 'Development', subtitle: 'Epics & Plan', phase: 'development' },
-  { id: 7, title: 'Deployment', subtitle: 'Testing & Rollout', phase: 'deployment' },
-  { id: 8, title: 'Success', subtitle: 'Metrics & Criteria', phase: 'success' },
-  { id: 9, title: 'Strategy', subtitle: 'Future & Fit', phase: 'strategy' },
+const SECTIONS: Section[] = [
+  { id: 'hero', label: 'Title & Strategic Intent', shortLabel: 'Intro' },
+  { id: 'context', label: 'Product Strategy Context', shortLabel: 'Context' },
+  { id: 'problem', label: 'Problem & Segments', shortLabel: 'Problem' },
+  { id: 'landscape', label: 'Competitive Landscape', shortLabel: 'Landscape' },
+  { id: 'proposal', label: 'DeFi Actions Mode', shortLabel: 'Proposal' },
+  { id: 'impact', label: 'Impact & Standards', shortLabel: 'Impact' },
+  { id: 'prd', label: 'PRD Snapshot', shortLabel: 'PRD' },
+  { id: 'stakeholders', label: 'Stakeholders & Risks', shortLabel: 'Design' },
+  { id: 'development', label: 'Epics & PM Role', shortLabel: 'Dev' },
+  { id: 'deployment', label: 'GTM & Success', shortLabel: 'GTM' },
 ];
 
 const DEFI_ACTIONS: DeFiAction[] = [
-  { id: 'morpho-usdc-base', label: 'Deposit into Morpho USDC Vault', protocol: 'Morpho', type: 'deposit', chain: 'Base', chainId: 8453, apy: '8.2%', tvl: '$142M', icon: '🔵', color: '#0052FF' },
-  { id: 'aave-usdc-op', label: 'Deposit into Aave USDC', protocol: 'Aave', type: 'deposit', chain: 'Optimism', chainId: 10, apy: '5.4%', tvl: '$312M', icon: '👻', color: '#B6509E' },
-  { id: 'pendle-steth-arb', label: 'Stake into Pendle PT-eETH', protocol: 'Pendle', type: 'stake', chain: 'Arbitrum', chainId: 42161, apy: '12.1%', tvl: '$89M', icon: '🔮', color: '#00D395' },
-  { id: 'eigenlayer-eth', label: 'Restake ETH on EigenLayer', protocol: 'EigenLayer', type: 'stake', chain: 'Ethereum', chainId: 1, apy: '4.2%', tvl: '$15.2B', icon: '🟣', color: '#7B3FE4' },
+  { id: 'morpho-usdc-base', label: 'Deposit into Morpho USDC Vault', protocol: 'Morpho', type: 'deposit', chain: 'Base', chainId: 8453, icon: '🔵', color: '#0052FF' },
+  { id: 'aave-usdc-op', label: 'Deposit into Aave USDC Market', protocol: 'Aave', type: 'deposit', chain: 'Optimism', chainId: 10, icon: '👻', color: '#B6509E' },
+  { id: 'pendle-steth-arb', label: 'Stake PT-eETH on Pendle', protocol: 'Pendle', type: 'stake', chain: 'Arbitrum', chainId: 42161, icon: '🔮', color: '#00D395' },
 ];
 
 const CHAINS = [
@@ -78,32 +74,39 @@ const TOKENS = [
   { symbol: 'USDT', icon: '💲', balance: '890.50' },
 ];
 
-// === Components ===
-function SlideIndicator({ current, total, onNavigate }: { current: number; total: number; onNavigate: (idx: number) => void }) {
+// === Sidebar Navigation ===
+function SidebarNav({ activeSection, onNavigate, scrollProgress }: { 
+  activeSection: string; 
+  onNavigate: (id: string) => void;
+  scrollProgress: number;
+}) {
   return (
-    <div className="slide-indicator">
-      {Array.from({ length: total }).map((_, i) => (
-        <button
-          key={i}
-          className={`indicator-dot ${current === i ? 'active' : ''}`}
-          onClick={() => onNavigate(i)}
-          title={`${SLIDES[i].title}${SLIDES[i].subtitle ? ': ' + SLIDES[i].subtitle : ''}`}
-        />
-      ))}
-    </div>
+    <nav className="sidebar-nav">
+      <div className="sidebar-header">
+        <LiFiLogoHorizontal height={20} />
+      </div>
+      <div className="sidebar-sections">
+        {SECTIONS.map((section, index) => (
+          <button
+            key={section.id}
+            className={`sidebar-item ${activeSection === section.id ? 'active' : ''}`}
+            onClick={() => onNavigate(section.id)}
+          >
+            <span className="sidebar-number">{String(index + 1).padStart(2, '0')}</span>
+            <span className="sidebar-label">{section.shortLabel}</span>
+          </button>
+        ))}
+      </div>
+      <div className="sidebar-progress">
+        <div className="progress-track">
+          <div className="progress-fill" style={{ height: `${scrollProgress}%` }} />
+        </div>
+      </div>
+    </nav>
   );
 }
 
-function NavigationControls({ current, total, onPrev, onNext }: { current: number; total: number; onPrev: () => void; onNext: () => void }) {
-  return (
-    <div className="nav-controls">
-      <button className="nav-btn" onClick={onPrev} disabled={current === 0} title="Previous (←)">←</button>
-      <span className="nav-counter">{current + 1} / {total}</span>
-      <button className="nav-btn" onClick={onNext} disabled={current === total - 1} title="Next (→)">→</button>
-    </div>
-  );
-}
-
+// === Code Block ===
 function CodeBlock({ code, filename = 'widget-config.tsx' }: { code: string; filename?: string }) {
   return (
     <div className="code-block">
@@ -116,7 +119,7 @@ function CodeBlock({ code, filename = 'widget-config.tsx' }: { code: string; fil
   );
 }
 
-// Interactive Widget Mockup
+// === Interactive Widget Mockup ===
 function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
   selectedAction: DeFiAction | null;
   onSelectAction: (action: DeFiAction | null) => void;
@@ -206,7 +209,6 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
                     <span className="action-label">{action.label}</span>
                     <span className="action-meta">
                       <span className="action-chain">{action.chain}</span>
-                      <span className="action-apy">APY {action.apy}</span>
                     </span>
                   </div>
                   <div className="action-arrow">→</div>
@@ -222,7 +224,7 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
               <span className="banner-icon" style={{ background: selectedAction.color }}>{selectedAction.icon}</span>
               <div className="banner-info">
                 <span className="banner-label">{selectedAction.label}</span>
-                <span className="banner-meta">{selectedAction.chain} • APY {selectedAction.apy}</span>
+                <span className="banner-meta">{selectedAction.chain}</span>
               </div>
             </div>
             <div className="widget-form">
@@ -317,7 +319,7 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
                   <span className="step-status" style={{ background: selectedAction.color }}>{selectedAction.icon}</span>
                 </div>
               </div>
-              <div className="info-cards">
+              <div className="info-cards two-col">
                 <div className="info-card">
                   <span className="info-label">You Receive</span>
                   <span className="info-value">{formatNumber((parseFloat(amount.replace(/,/g, '') || '0') * 0.997).toFixed(2))}</span>
@@ -327,11 +329,6 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
                   <span className="info-label">Est. Time</span>
                   <span className="info-value">{sourceChain.name !== selectedAction.chain ? '~3' : '~1'}</span>
                   <span className="info-unit">minutes</span>
-                </div>
-                <div className="info-card highlight">
-                  <span className="info-label">APY</span>
-                  <span className="info-value">{selectedAction.apy}</span>
-                  <span className="info-unit">variable</span>
                 </div>
               </div>
               <div className="security-badge">
@@ -356,7 +353,7 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
             <div className="success-details">
               <div className="detail-row"><span>Protocol</span><span>{selectedAction.protocol}</span></div>
               <div className="detail-row"><span>Chain</span><span>{selectedAction.chain}</span></div>
-              <div className="detail-row"><span>Expected APY</span><span className="highlight">{selectedAction.apy}</span></div>
+              <div className="detail-row"><span>Status</span><span className="highlight">Confirmed</span></div>
             </div>
             <button className="widget-cta secondary" onClick={resetWidget}>New Action</button>
           </div>
@@ -372,728 +369,820 @@ function WidgetMockup({ selectedAction, onSelectAction, step, onStepChange }: {
 
 // === Main Component ===
 export default function DeFiActionsDemo() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [activeSection, setActiveSection] = useState('hero');
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [selectedAction, setSelectedAction] = useState<DeFiAction | null>(null);
   const [widgetStep, setWidgetStep] = useState<'select' | 'configure' | 'review' | 'success'>('select');
+  const mainRef = useRef<HTMLElement>(null);
+  const sectionRefs = useRef<Map<string, HTMLElement>>(new Map());
 
-  const goToSlide = useCallback((idx: number) => {
-    if (idx >= 0 && idx < SLIDES.length) {
-      setCurrentSlide(idx);
-      if (idx === 9) {
-        setSelectedAction(null);
-        setWidgetStep('select');
-      }
+  // Handle scroll progress and active section detection
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!mainRef.current) return;
+      
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      setScrollProgress(Math.min(100, Math.max(0, progress)));
+
+      // Find active section
+      let currentSection = 'hero';
+      sectionRefs.current.forEach((element, id) => {
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= window.innerHeight * 0.4) {
+          currentSection = id;
+        }
+      });
+      setActiveSection(currentSection);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navigateToSection = useCallback((id: string) => {
+    const element = sectionRefs.current.get(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
 
-  const goNext = useCallback(() => goToSlide(currentSlide + 1), [currentSlide, goToSlide]);
-  const goPrev = useCallback(() => goToSlide(currentSlide - 1), [currentSlide, goToSlide]);
+  const registerSection = useCallback((id: string, element: HTMLElement | null) => {
+    if (element) {
+      sectionRefs.current.set(id, element);
+    }
+  }, []);
 
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeElement = document.activeElement;
-      const isTyping = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA' || (activeElement as HTMLElement)?.isContentEditable;
+      const isTyping = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA';
       
-      if (e.key === 'ArrowRight' || e.key === ' ') {
-        if (!isTyping) { e.preventDefault(); goNext(); }
-      } else if (e.key === 'ArrowLeft') {
-        if (!isTyping) { e.preventDefault(); goPrev(); }
-      } else if (e.key >= '1' && e.key <= '9') {
-        if (!isTyping) {
-          const idx = parseInt(e.key) - 1;
-          if (idx < SLIDES.length) goToSlide(idx);
+      if (!isTyping && e.key >= '0' && e.key <= '9') {
+        const idx = e.key === '0' ? 9 : parseInt(e.key) - 1;
+        if (idx < SECTIONS.length) {
+          navigateToSection(SECTIONS[idx].id);
         }
-      } else if (e.key === '0') {
-        if (!isTyping) goToSlide(9);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goNext, goPrev, goToSlide]);
-
-  const renderSlideContent = () => {
-    switch (currentSlide) {
-      case 0:
-        return (
-          <div className="slide slide-title">
-            <div className="title-content">
-              <div className="title-badge">LI.FI Widget – Feature Proposal</div>
-              <h1 className="main-title">
-                DeFi Actions Mode
-                <span className="subtitle-line">Composer-Powered</span>
-              </h1>
-              <p className="title-desc">Turning complex DeFi workflows into first-class, integrator-friendly "actions."</p>
-              
-              <div className="role-context">
-                <div className="role-header">
-                  <span className="role-icon">👤</span>
-                  <span className="role-title">My Role</span>
-                </div>
-                <p className="role-desc">Product Manager for LI.FI Widget & SDK — responsible for adoption, integrator UX, reducing integration effort, and aligning widget capabilities with LI.FI's broader intent strategy.</p>
-              </div>
-
-              <div className="goal-box">
-                <span className="goal-label">Goal of this iteration</span>
-                <p className="goal-text">Grow widget adoption by enabling new markets and use cases—specifically, protocol-level onboarding and cross-chain DeFi flows that today require custom engineering.</p>
-              </div>
-            </div>
-            <div className="title-visual">
-              <div className="visual-orb orb-1"></div>
-              <div className="visual-orb orb-2"></div>
-              <div className="visual-orb orb-3"></div>
-            </div>
-          </div>
-        );
-
-      case 1:
-        return (
-          <div className="slide slide-discovery">
-            <div className="slide-header">
-              <span className="slide-number">01</span>
-              <h2>Discovery: The Real Problem</h2>
-              <span className="phase-badge discovery">Discovery</span>
-            </div>
-            <div className="slide-body two-col">
-              <div className="col">
-                <div className="fact-box">
-                  <span className="fact-label">Fact</span>
-                  <p>The LI.FI Widget today optimizes for <strong>liquidity routing</strong>:</p>
-                  <div className="quote-block">"Go from token A on chain X to token B on chain Y."</div>
-                  <p className="fact-contrast">But DeFi protocols don't want <em>token routing</em>. They want <strong>action routing</strong>.</p>
-                </div>
-
-                <div className="requests-section">
-                  <h3>Common Partner Requests</h3>
-                  <div className="request-list">
-                    <div className="request-item">
-                      <span className="request-icon">🏦</span>
-                      <span>"Let users <strong>deposit into our vault</strong> from any chain."</span>
-                    </div>
-                    <div className="request-item">
-                      <span className="request-icon">🎯</span>
-                      <span>"Let users <strong>stake into our pool</strong> in one click."</span>
-                    </div>
-                    <div className="request-item">
-                      <span className="request-icon">📈</span>
-                      <span>"Let users <strong>open a leveraged position</strong> cross-chain."</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col">
-                <div className="composer-box">
-                  <h3>What Exists Today: Composer</h3>
-                  <p>Composer already provides powerful multi-step, on-chain orchestrated flows <code>(swap→bridge→deposit)</code>.</p>
-                  <div className="but-section">
-                    <span className="but-label">But:</span>
-                    <ul className="limitation-list">
-                      <li>It's treated as an <strong>advanced tool</strong>, not a productized widget feature</li>
-                      <li>Integrators must know vault token addresses</li>
-                      <li>Integrators must manually whitelist Composer</li>
-                      <li>Integrators must understand zap semantics</li>
-                      <li>Integrators must map flows to UX themselves</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="gap-highlight">
-                  <span className="gap-emoji">🔹</span>
-                  <div className="gap-text">
-                    <p>LI.FI has the infra for one-click DeFi actions…</p>
-                    <p className="gap-contrast">…but not the product surface that exposes it scalably.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="slide slide-commercial">
-            <div className="slide-header">
-              <span className="slide-number">02</span>
-              <h2>Discovery: Why This Matters Commercially</h2>
-              <span className="phase-badge discovery">Discovery</span>
-            </div>
-            <div className="slide-body">
-              <div className="segments-section">
-                <h3>Target Segments Affected</h3>
-                <div className="segments-grid-v3">
-                  <div className="segment-card-v3">
-                    <div className="segment-header-v3">
-                      <span className="segment-icon-v3">🏦</span>
-                      <h4>Protocols</h4>
-                      <span className="segment-examples">Morpho, Aave, Pendle, LRTs, RWAs</span>
-                    </div>
-                    <p className="segment-want">Want frictionless cross-chain onboarding</p>
-                    <p className="segment-pain">Lose users today due to multi-step flows</p>
-                  </div>
-                  <div className="segment-card-v3">
-                    <div className="segment-header-v3">
-                      <span className="segment-icon-v3">📱</span>
-                      <h4>Wallets & Superapps</h4>
-                    </div>
-                    <p className="segment-want">Want to deepen UX and improve retention</p>
-                    <p className="segment-pain">Prefer config-based features over custom orchestration</p>
-                  </div>
-                  <div className="segment-card-v3">
-                    <div className="segment-header-v3">
-                      <span className="segment-icon-v3">⛓️</span>
-                      <h4>Chains / Appchains</h4>
-                    </div>
-                    <p className="segment-want">Want Day-1 onboarding flows using LI.FI infra</p>
-                    <p className="segment-pain">Composer-powered flows are a strong selling point</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="opportunity-strategy">
-                <div className="opportunity-box">
-                  <h3>🎯 Opportunity</h3>
-                  <p>Create a <strong>generalizable, low-effort way</strong> to onboard users into any protocol across chains.</p>
-                </div>
-                <div className="strategy-box">
-                  <h3>Strategic Alignment with LI.FI 2.0</h3>
-                  <div className="strategy-flow">
-                    <span className="flow-step">Routing</span>
-                    <span className="flow-arrow">→</span>
-                    <span className="flow-step highlight">Orchestration (Composer)</span>
-                    <span className="flow-arrow">→</span>
-                    <span className="flow-step">Intents (Catalyst)</span>
-                  </div>
-                  <p className="strategy-conclusion">DeFi Actions Mode is the <strong>first integrator-facing expression</strong> of LI.FI's intent stack.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="slide slide-solution">
-            <div className="slide-header">
-              <span className="slide-number">03</span>
-              <h2>Proposed Iteration: DeFi Actions Mode</h2>
-              <span className="phase-badge solution">Solution</span>
-            </div>
-            <div className="slide-body two-col">
-              <div className="col">
-                <div className="what-section">
-                  <h3>What It Is</h3>
-                  <p className="what-desc">A new widget mode that exposes Composer flows as <strong>predefined, named actions</strong> instead of "swap to token."</p>
-                  
-                  <div className="examples-list">
-                    <div className="example-item"><span className="example-bullet">●</span>Deposit into Morpho USDC Vault (Base)</div>
-                    <div className="example-item"><span className="example-bullet">●</span>Stake into Pendle PT-eETH</div>
-                    <div className="example-item"><span className="example-bullet">●</span>Deposit USDC into Aave on Optimism</div>
-                  </div>
-                </div>
-
-                <div className="how-section">
-                  <h3>How It Works</h3>
-                  <div className="how-steps">
-                    <div className="how-step">
-                      <span className="how-num">1</span>
-                      <span>LI.FI maintains an <strong>Action Registry</strong></span>
-                    </div>
-                    <div className="how-step">
-                      <span className="how-num">2</span>
-                      <span>Each action maps to a Composer zap + metadata</span>
-                    </div>
-                    <div className="how-step">
-                      <span className="how-num">3</span>
-                      <span>Widget executes: <code>swap → bridge → swap → deposit → return vault token</code></span>
-                    </div>
-                  </div>
-                </div>
-
-                <CodeBlock code={`<LiFiWidget
-  mode="defiActions"
-  actions={[
-    { id: "morpho-usdc-base" },
-    { id: "aave-usdc-op" }
-  ]}
-/>`} />
-              </div>
-              <div className="col">
-                <div className="benefits-section">
-                  <h3>What Integrators Get</h3>
-                  <div className="benefits-grid">
-                    <div className="benefit-item removed">
-                      <span className="benefit-icon">✗</span>
-                      <span>No zap logic</span>
-                    </div>
-                    <div className="benefit-item removed">
-                      <span className="benefit-icon">✗</span>
-                      <span>No contract orchestration</span>
-                    </div>
-                    <div className="benefit-item removed">
-                      <span className="benefit-icon">✗</span>
-                      <span>No vault-token plumbing</span>
-                    </div>
-                    <div className="benefit-item removed">
-                      <span className="benefit-icon">✗</span>
-                      <span>No multi-step UX design</span>
-                    </div>
-                    <div className="benefit-item added">
-                      <span className="benefit-icon">→</span>
-                      <span><strong>Just configure and go.</strong></span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="widget-preview-box">
-                  <h4>Preview</h4>
-                  <WidgetMockup selectedAction={selectedAction} onSelectAction={setSelectedAction} step={widgetStep} onStepChange={setWidgetStep} />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="slide slide-analysis">
-            <div className="slide-header">
-              <span className="slide-number">04</span>
-              <h2>Why This Problem Still Exists (Despite Composer)</h2>
-              <span className="phase-badge analysis">Analysis</span>
-            </div>
-            <div className="slide-body two-col">
-              <div className="col">
-                <div className="insight-box">
-                  <h3>Composer ≠ Product</h3>
-                  <p>Composer today is:</p>
-                  <div className="composer-traits">
-                    <span className="trait">powerful</span>
-                    <span className="trait">generic</span>
-                    <span className="trait">flexible</span>
-                  </div>
-                  <p className="but-not">…but <strong>not packaged</strong> for integrators in a zero-effort way.</p>
-                </div>
-
-                <div className="integrator-burden">
-                  <h3>Integrators Still Need To:</h3>
-                  <ul className="burden-list">
-                    <li>Know which vault token corresponds to which protocol action</li>
-                    <li>Understand when to use <code>/quote</code> vs <code>/advanced/routes</code></li>
-                    <li>Manually request Composer whitelisting</li>
-                    <li>Design their own UX for multi-step DeFi flows</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="col">
-                <div className="widget-model-box">
-                  <h3>Widget's Current Model</h3>
-                  <div className="model-points">
-                    <div className="model-point">
-                      <span className="point-icon">📊</span>
-                      <span>Presents <strong>tokens</strong>, not protocol actions</span>
-                    </div>
-                    <div className="model-point">
-                      <span className="point-icon">❓</span>
-                      <span>Does not distinguish: deposits vs swaps, staking vs bridging, actions with position tokens</span>
-                    </div>
-                    <div className="model-point">
-                      <span className="point-icon">🔧</span>
-                      <span>Operates at <strong>liquidity level</strong>, not intent level</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="gap-summary">
-                  <h3>Therefore, the gap remains:</h3>
-                  <div className="gap-statement">
-                    <p>LI.FI has the infra for one-click DeFi UX but lacks a <strong>turnkey, productized interface</strong> for it.</p>
-                    <p className="closing-statement">This iteration closes that gap.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="slide slide-design">
-            <div className="slide-header">
-              <span className="slide-number">05</span>
-              <h2>Design: PRD Snapshot</h2>
-              <span className="phase-badge design">Design</span>
-            </div>
-            <div className="slide-body two-col">
-              <div className="col">
-                <div className="prd-goal">
-                  <h3>🎯 Goal</h3>
-                  <p>Provide integrators with a safe, curated, frictionless way to use Composer flows.</p>
-                </div>
-
-                <div className="core-requirements">
-                  <h3>Core Requirements</h3>
-                  <div className="requirement-card">
-                    <span className="req-num">1</span>
-                    <div className="req-content">
-                      <strong>Action List UI</strong>
-                      <p>Predefined actions shown as selectable tiles. Metadata: protocol logo, chain, APR (optional, source-controlled)</p>
-                    </div>
-                  </div>
-                  <div className="requirement-card">
-                    <span className="req-num">2</span>
-                    <div className="req-content">
-                      <strong>Action Detail & Route Summary</strong>
-                      <p>Shows swap/bridge/deposit steps abstracted. Highlights gas usage, expected output vault token</p>
-                    </div>
-                  </div>
-                  <div className="requirement-card">
-                    <span className="req-num">3</span>
-                    <div className="req-content">
-                      <strong>Routing / Execution</strong>
-                      <p>Uses Composer tool automatically. Integrates pre-execution simulation. Surfaces failure reasons clearly</p>
-                    </div>
-                  </div>
-                  <div className="requirement-card">
-                    <span className="req-num">4</span>
-                    <div className="req-content">
-                      <strong>Configuration Options</strong>
-                      <p>Which actions to expose, which chains/tokens to allow, default risk messaging</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col">
-                <div className="nfr-section">
-                  <h3>Non-Functional Requirements</h3>
-                  <ul className="nfr-list">
-                    <li>Must fail safely if Composer unavailable</li>
-                    <li>Must work with existing Permit2/712 integrations</li>
-                    <li>Should not require protocol updates by integrators</li>
-                  </ul>
-                </div>
-
-                <div className="assumptions-section">
-                  <h3>Assumptions (To Validate)</h3>
-                  <div className="assumption-list">
-                    <div className="assumption-item">
-                      <span className="assumption-status">?</span>
-                      <span>Protocols prefer LI.FI-maintained zap definitions</span>
-                    </div>
-                    <div className="assumption-item">
-                      <span className="assumption-status">?</span>
-                      <span>Wallets are comfortable exposing curated actions</span>
-                    </div>
-                    <div className="assumption-item">
-                      <span className="assumption-status">?</span>
-                      <span>Risk disclaimers can remain lightweight (pending legal review)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 6:
-        return (
-          <div className="slide slide-development">
-            <div className="slide-header">
-              <span className="slide-number">06</span>
-              <h2>Development: Epics & Plan</h2>
-              <span className="phase-badge development">Development</span>
-            </div>
-            <div className="slide-body">
-              <div className="epics-grid-v2">
-                <div className="epic-card-v2">
-                  <div className="epic-header-v2">
-                    <span className="epic-num">1</span>
-                    <h4>Action Registry (Backend)</h4>
-                  </div>
-                  <ul className="epic-items">
-                    <li>Data model: <code>actionId → Composer spec + metadata</code></li>
-                    <li>Tooling for LI.FI team to update registry safely</li>
-                    <li>Versioning for protocol vault changes</li>
-                  </ul>
-                </div>
-                <div className="epic-card-v2">
-                  <div className="epic-header-v2">
-                    <span className="epic-num">2</span>
-                    <h4>Widget Experience</h4>
-                  </div>
-                  <ul className="epic-items">
-                    <li><code>mode="defiActions"</code></li>
-                    <li>Action list, detail page, simulation state</li>
-                    <li>Signing UX: single-transaction execution</li>
-                  </ul>
-                </div>
-                <div className="epic-card-v2">
-                  <div className="epic-header-v2">
-                    <span className="epic-num">3</span>
-                    <h4>Routing & Composer Integration</h4>
-                  </div>
-                  <ul className="epic-items">
-                    <li>Ensure <code>/advanced/routes</code> pulls correct Composer tool</li>
-                    <li>Integrate simulation results</li>
-                    <li>Error handling & fallback behavior</li>
-                  </ul>
-                </div>
-                <div className="epic-card-v2">
-                  <div className="epic-header-v2">
-                    <span className="epic-num">4</span>
-                    <h4>Docs, Examples, Telemetry</h4>
-                  </div>
-                  <ul className="epic-items">
-                    <li>Developer guide: "How to enable DeFi Actions Mode"</li>
-                    <li>Tracking: view → select → quote → submit → success/fail</li>
-                    <li>Playground config support</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="pm-role-section">
-                <h3>My Role as PM</h3>
-                <div className="pm-responsibilities">
-                  <div className="pm-item"><span className="pm-bullet">●</span>Keep scope tight (deposit-focused MVP)</div>
-                  <div className="pm-item"><span className="pm-bullet">●</span>Ensure UX clarity around risk and staking</div>
-                  <div className="pm-item"><span className="pm-bullet">●</span>Validate staging w/ design partners (wallet, protocol)</div>
-                  <div className="pm-item"><span className="pm-bullet">●</span>Drive alignment between engineering, DevRel, BD</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 7:
-        return (
-          <div className="slide slide-deployment">
-            <div className="slide-header">
-              <span className="slide-number">07</span>
-              <h2>Deployment & Testing Plan</h2>
-              <span className="phase-badge deployment">Deployment</span>
-            </div>
-            <div className="slide-body two-col">
-              <div className="col">
-                <div className="qa-section">
-                  <h3>Internal QA</h3>
-                  <p>Test actions across multiple chains (ETH, Base, OP, Arbitrum)</p>
-                  <div className="failure-modes">
-                    <h4>Simulate failure modes:</h4>
-                    <ul>
-                      <li>Insufficient gas on destination</li>
-                      <li>Unsupported token for action</li>
-                      <li>Composer disabled</li>
-                      <li>Vault token mismatch</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="partner-rollout">
-                  <h3>Design Partner Rollout</h3>
-                  <div className="partner-targets">
-                    <div className="partner-target">
-                      <span className="partner-icon">🏦</span>
-                      <span>1 protocol (e.g., Morpho)</span>
-                    </div>
-                    <div className="partner-target">
-                      <span className="partner-icon">📱</span>
-                      <span>1 wallet (mid-size integrator)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col">
-                <div className="beta-metrics">
-                  <h3>Key Metrics During Beta</h3>
-                  <div className="metric-list">
-                    <div className="metric-item">
-                      <span className="metric-icon">⏱️</span>
-                      <span>Time to integrate</span>
-                    </div>
-                    <div className="metric-item">
-                      <span className="metric-icon">✓</span>
-                      <span>Success rate vs multi-step flows</span>
-                    </div>
-                    <div className="metric-item">
-                      <span className="metric-icon">📉</span>
-                      <span>Drop-off improvement</span>
-                    </div>
-                    <div className="metric-item">
-                      <span className="metric-icon">💬</span>
-                      <span>Qualitative feedback on clarity & confidence</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="public-rollout">
-                  <h3>Public Rollout</h3>
-                  <ul className="rollout-items">
-                    <li>Changelog + docs</li>
-                    <li>BD outreach to top protocols</li>
-                    <li>Highlight in LI.FI weekly/product updates</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 8:
-        return (
-          <div className="slide slide-success">
-            <div className="slide-header">
-              <span className="slide-number">08</span>
-              <h2>Success Criteria</h2>
-              <span className="phase-badge success">Success</span>
-            </div>
-            <div className="slide-body">
-              <div className="metrics-categories">
-                <div className="metrics-category">
-                  <h3><span className="category-icon">📈</span> Adoption Metrics</h3>
-                  <div className="metric-cards">
-                    <div className="metric-card-v3">
-                      <span className="metric-value-v3">10+</span>
-                      <span className="metric-label-v3">integrators enabling DeFi Actions Mode</span>
-                      <span className="metric-timeline">within 6–8 weeks</span>
-                    </div>
-                    <div className="metric-card-v3">
-                      <span className="metric-value-v3">↑</span>
-                      <span className="metric-label-v3">cross-chain protocol deposit volume</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="metrics-category">
-                  <h3><span className="category-icon">🎯</span> UX Metrics</h3>
-                  <div className="metric-cards">
-                    <div className="metric-card-v3 highlight">
-                      <span className="metric-value-v3">70%</span>
-                      <span className="metric-label-v3">completion rate</span>
-                      <span className="metric-compare">vs &lt;40% typical cross-chain flows</span>
-                    </div>
-                    <div className="metric-card-v3">
-                      <span className="metric-value-v3">↓↓</span>
-                      <span className="metric-label-v3">multi-step drop-offs</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="metrics-category">
-                  <h3><span className="category-icon">⚙️</span> Operational Metrics</h3>
-                  <div className="metric-cards">
-                    <div className="metric-card-v3">
-                      <span className="metric-value-v3">↓</span>
-                      <span className="metric-label-v3">integration engineering hours for zap-based flows</span>
-                    </div>
-                    <div className="metric-card-v3">
-                      <span className="metric-value-v3">↓</span>
-                      <span className="metric-label-v3">support tickets related to protocol onboarding</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="strategic-impact">
-                  <h3><span className="category-icon">🚀</span> Strategic Impact</h3>
-                  <div className="impact-points">
-                    <p>Strengthens LI.FI position as <strong>intent execution layer</strong></p>
-                    <p>Moves widget beyond routing → <strong>generalized DeFi entry point</strong></p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 9:
-        return (
-          <div className="slide slide-strategy">
-            <div className="slide-header">
-              <span className="slide-number">09</span>
-              <h2>Strategic Fit & Future Iterations</h2>
-              <span className="phase-badge strategy">Strategy</span>
-            </div>
-            <div className="slide-body two-col">
-              <div className="col">
-                <div className="alignment-section">
-                  <h3>How This Aligns with LI.FI 2.0</h3>
-                  <div className="evolution-flow">
-                    <div className="evolution-step">
-                      <span className="evo-label">Routing</span>
-                      <span className="evo-desc">LI.FI API</span>
-                    </div>
-                    <span className="evo-arrow">→</span>
-                    <div className="evolution-step active">
-                      <span className="evo-label">Orchestration</span>
-                      <span className="evo-desc">Composer</span>
-                    </div>
-                    <span className="evo-arrow">→</span>
-                    <div className="evolution-step">
-                      <span className="evo-label">Intents</span>
-                      <span className="evo-desc">Catalyst</span>
-                    </div>
-                    <span className="evo-arrow">→</span>
-                    <div className="evolution-step">
-                      <span className="evo-label">Chain Abstraction</span>
-                      <span className="evo-desc">Resource locks, AA</span>
-                    </div>
-                  </div>
-                  <div className="alignment-insight">
-                    <p>DeFi Actions Mode is the <strong>natural next layer</strong>:</p>
-                    <ul>
-                      <li>User expresses intent: "deposit into X protocol"</li>
-                      <li>Widget abstracts execution</li>
-                      <li>Under the hood: can evolve to use solvers, private liquidity, zero-slippage OFT flows</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col">
-                <div className="future-extensions">
-                  <h3>Future Extensions</h3>
-                  <ul className="extension-list">
-                    <li>Withdraw/repay actions</li>
-                    <li>Support for non-EVM chains (pending Composer expansion)</li>
-                    <li>Dynamic APR data from protocols</li>
-                    <li>User-defined custom actions (long-term)</li>
-                    <li>Integration with LI.FI 2.0 solver competition for better pricing & gasless flows</li>
-                  </ul>
-                </div>
-
-                <div className="closing-statement-box">
-                  <p className="closing-intro">This is not just a feature.</p>
-                  <p className="closing-main">It is the <strong>first user-facing manifestation</strong> of LI.FI's shift from cross-chain routing → intent execution.</p>
-                  <p className="closing-benefits">It amplifies existing infra, reduces integration cost, and opens LI.FI to entirely new markets.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
+  }, [navigateToSection]);
 
   return (
-    <div className="defi-demo">
-      <header className="demo-header">
-        <div className="header-brand">
-          <LiFiLogoHorizontal height={24} className="header-logo" />
-        </div>
-        <div className="header-center">
-          <span className="header-title">DeFi Actions Mode — Feature Proposal</span>
-        </div>
-        <div className="header-controls">
-          <span className="keyboard-hint">← → to navigate • 1-0 for slides</span>
-        </div>
-      </header>
+    <div className="landing-page">
+      <SidebarNav 
+        activeSection={activeSection} 
+        onNavigate={navigateToSection}
+        scrollProgress={scrollProgress}
+      />
+      
+      <main className="main-content" ref={mainRef}>
+        {/* === SLIDE 1: HERO / TITLE & STRATEGIC INTENT === */}
+        <section id="hero" className="section section-hero" ref={el => registerSection('hero', el)}>
+          <div className="hero-background">
+            <div className="hero-orb orb-1"></div>
+            <div className="hero-orb orb-2"></div>
+            <div className="hero-orb orb-3"></div>
+          </div>
+          <div className="hero-content">
+            <div className="hero-badge">LI.FI Widget — Feature Proposal</div>
+            <h1 className="hero-title">
+              DeFi Actions Mode
+              <span className="hero-subtitle">Composer-Powered</span>
+            </h1>
+            <p className="hero-description">
+              Expanding the LI.FI Widget into a <strong>configurable onboarding layer</strong> for cross-chain DeFi.
+            </p>
+            
+            <div className="hero-meta">
+              <span className="hero-role">Product Manager — LI.FI Widget & SDK</span>
+            </div>
 
-      <main className="demo-main">
-        {renderSlideContent()}
+            <div className="hero-cards">
+              <div className="hero-card">
+                <span className="hero-card-icon">🎯</span>
+                <span className="hero-card-label">Strategic Intent</span>
+                <p>Extend LI.FI Widget adoption into new <strong>DeFi onboarding use cases</strong> by exposing curated, Composer-powered multi-step flows as configurable user actions.</p>
+              </div>
+              <div className="hero-card highlight">
+                <span className="hero-card-icon">📉</span>
+                <span className="hero-card-label">Expected Impact</span>
+                <p>Significantly lower integration effort for complex cross-chain DeFi flows — from <strong>multiple days → ≤ 1 day</strong> — based on typical partner workflows <em>(to be validated)</em>.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* === SLIDE 2: CONTEXT === */}
+        <section id="context" className="section section-context" ref={el => registerSection('context', el)}>
+          <div className="section-inner">
+            <div className="section-header">
+              <span className="section-number">02</span>
+              <h2 className="section-title">Where This Fits Into LI.FI's Strategy</h2>
+            </div>
+            
+            <div className="context-grid">
+              <div className="context-card">
+                <div className="context-icon">🔀</div>
+                <h3>Routing Layer</h3>
+                <p>Multi-DEX + multi-bridge aggregation for cross-chain swaps.</p>
+                <span className="context-status">Live today</span>
+              </div>
+              <div className="context-card">
+                <div className="context-icon">🧩</div>
+                <h3>LI.FI Widget</h3>
+                <p>Customizable, zero-backend-required UI for swaps/bridges, adopted by wallets, dApps, and chains.</p>
+                <span className="context-status">Live today</span>
+              </div>
+              <div className="context-card featured">
+                <div className="context-icon">⚡</div>
+                <h3>Composer</h3>
+                <p>Orchestration engine enabling multi-step flows (swap → bridge → deposit) using contract calls and on-chain VM.</p>
+                <span className="context-status highlight">Infrastructure ready</span>
+              </div>
+            </div>
+
+            <div className="strategy-direction">
+              <div className="direction-label">Strategic Direction</div>
+              <div className="direction-flow">
+                <div className="direction-node">Routing</div>
+                <div className="direction-arrow">→</div>
+                <div className="direction-node active">Intent-driven</div>
+                <div className="direction-arrow">→</div>
+                <div className="direction-node">Solver-based execution</div>
+              </div>
+            </div>
+
+            <div className="context-boxes">
+              <div className="context-box limitation">
+                <h4>Current Limitation</h4>
+                <p>Composer is powerful at the infra/API level but <strong>not accessible via the Widget</strong> without custom engineering and complex UX work.</p>
+              </div>
+              <div className="context-box opportunity">
+                <h4>Opportunity</h4>
+                <p>Turn Composer's capabilities into a <strong>Widget-native mode</strong>, unlocking new markets: protocol onboarding, L2 onboarding, restaking flows, strategy entry.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* === SLIDE 3: PROBLEM & WHO FEELS IT === */}
+        <section id="problem" className="section section-problem" ref={el => registerSection('problem', el)}>
+          <div className="section-inner">
+            <div className="section-header">
+              <span className="section-number">03</span>
+              <h2 className="section-title">Problem & Who Feels It</h2>
+            </div>
+            
+            <div className="problem-statement">
+              <div className="problem-icon">⚠️</div>
+              <div className="problem-content">
+                <h3>Core Problem</h3>
+                <p>Cross-chain DeFi onboarding requires multi-step flows across multiple UIs.<br/>
+                Composer solves the orchestration, but <strong>integrators must still build:</strong></p>
+              </div>
+            </div>
+
+            <div className="burden-grid">
+              <div className="burden-item"><span className="burden-num">1</span>Handling protocol-specific metadata (e.g., vault token addresses)</div>
+              <div className="burden-item"><span className="burden-num">2</span>Manual Composer integrations</div>
+              <div className="burden-item"><span className="burden-num">3</span>Custom UX for each action</div>
+              <div className="burden-item"><span className="burden-num">4</span>Failure-handling & simulation states</div>
+            </div>
+
+            <div className="impact-statement">
+              <span className="impact-arrow">→</span>
+              <span>This <strong>slows down or fully blocks</strong> adoption of DeFi onboarding use cases in the Widget.</span>
+            </div>
+
+            <div className="segments-header">
+              <h3>Primary Segments for v1</h3>
+              <p>Strongest pain & fastest adoption potential</p>
+            </div>
+
+            <div className="segments-grid">
+              <div className="segment-card">
+                <div className="segment-header">
+                  <span className="segment-icon">📱</span>
+                  <h4>Wallets</h4>
+                </div>
+                <div className="segment-need">
+                  <span className="need-label">User expectation</span>
+                  <p>Deposit, stake, or restake from any chain</p>
+                </div>
+                <div className="segment-pain">
+                  <span className="pain-label">Team pain</span>
+                  <p>Want to retain users without redirecting to external UIs</p>
+                </div>
+              </div>
+              <div className="segment-card">
+                <div className="segment-header">
+                  <span className="segment-icon">🏦</span>
+                  <h4>Protocols</h4>
+                </div>
+                <div className="segment-need">
+                  <span className="need-label">User expectation</span>
+                  <p>"Deposit from any chain" flows on-site</p>
+                </div>
+                <div className="segment-pain">
+                  <span className="pain-label">Team pain</span>
+                  <p>Lose users during onboarding (bridge → swap → deposit)</p>
+                </div>
+              </div>
+              <div className="segment-card">
+                <div className="segment-header">
+                  <span className="segment-icon">⛓️</span>
+                  <h4>Appchains / L2s</h4>
+                </div>
+                <div className="segment-need">
+                  <span className="need-label">User expectation</span>
+                  <p>Bridge in and use core apps immediately</p>
+                </div>
+                <div className="segment-pain">
+                  <span className="pain-label">Team pain</span>
+                  <p>Need turnkey onboarding flows for new ecosystems</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="segments-rationale">
+              <strong>Why these three:</strong> LI.FI's highest-frequency widget integrators with clearest unmet need around cross-chain DeFi actions.
+            </div>
+          </div>
+        </section>
+
+        {/* === SLIDE 4: COMPETITIVE LANDSCAPE === */}
+        <section id="landscape" className="section section-landscape" ref={el => registerSection('landscape', el)}>
+          <div className="section-inner">
+            <div className="section-header">
+              <span className="section-number">04</span>
+              <h2 className="section-title">Competitive Landscape</h2>
+              <p className="section-subtitle">Based on public docs; intentionally high-level and non-speculative</p>
+            </div>
+
+            <div className="landscape-table">
+              <div className="table-header">
+                <div className="col-project">Project</div>
+                <div className="col-widget">Widget / SDK</div>
+                <div className="col-flows">Multi-step DeFi?</div>
+                <div className="col-notes">Notes</div>
+              </div>
+              <div className="table-row highlight-row">
+                <div className="col-project"><strong>LI.FI (today)</strong></div>
+                <div className="col-widget">Swap/bridge widget</div>
+                <div className="col-flows"><span className="tag yellow">Infra only</span></div>
+                <div className="col-notes">Composer supports multi-step but not exposed as widget mode</div>
+              </div>
+              <div className="table-row">
+                <div className="col-project">Squid (Axelar)</div>
+                <div className="col-widget">Cross-chain swap widget</div>
+                <div className="col-flows"><span className="tag gray">Custom only</span></div>
+                <div className="col-notes">DeFi flows as custom partner integrations</div>
+              </div>
+              <div className="table-row">
+                <div className="col-project">Rango</div>
+                <div className="col-widget">Swap/bridge widget</div>
+                <div className="col-flows"><span className="tag red">No</span></div>
+                <div className="col-notes">Swap-centric, no DeFi onboarding actions</div>
+              </div>
+              <div className="table-row">
+                <div className="col-project">Socket</div>
+                <div className="col-widget">SDK-first router</div>
+                <div className="col-flows"><span className="tag gray">Custom only</span></div>
+                <div className="col-notes">"One-click" flows are partner-specific</div>
+              </div>
+              <div className="table-row">
+                <div className="col-project">Vertical zaps</div>
+                <div className="col-widget">Protocol-specific widgets</div>
+                <div className="col-flows"><span className="tag green">Yes, limited</span></div>
+                <div className="col-notes">Not cross-protocol, not cross-chain</div>
+              </div>
+            </div>
+
+            <div className="gap-highlight">
+              <div className="gap-icon">💡</div>
+              <div className="gap-text">
+                <h4>Market Gap</h4>
+                <p>No provider offers a <strong>general-purpose, cross-chain "DeFi Actions Mode"</strong> inside a routing widget that any integrator can enable through configuration.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* === SLIDE 5: PROPOSAL === */}
+        <section id="proposal" className="section section-proposal" ref={el => registerSection('proposal', el)}>
+          <div className="section-inner">
+            <div className="section-header">
+              <span className="section-number">05</span>
+              <h2 className="section-title">DeFi Actions Mode</h2>
+            </div>
+
+            <div className="proposal-layout">
+              <div className="proposal-content">
+                <div className="proposal-concept">
+                  <h3>Concept</h3>
+                  <p>Introduce a new widget mode that surfaces <strong>curated, safe, Composer-powered DeFi actions</strong>, for example:</p>
+                  <ul className="action-examples">
+                    <li>"Deposit USDC into Aave v3 on Optimism"</li>
+                    <li>"Deposit into Morpho Base USDC Vault"</li>
+                    <li>"Stake PT-eETH with Pendle"</li>
+                    <li>"Enter sUSDe via Ethena"</li>
+                    <li>"Restake ETH into EigenLayer"</li>
+                  </ul>
+                  <p className="action-note">Each action is a <strong>turnkey abstraction</strong> over a Composer Zap.</p>
+                </div>
+
+                <div className="proposal-design">
+                  <h3>Internal Design (Proposed)</h3>
+                  <div className="design-item">
+                    <span className="design-bullet">→</span>
+                    <p>Maintain a versioned <strong>Action Registry</strong> mapping:<br/>
+                    <code>actionId → Composer spec + protocol metadata + supported chains + safety flags</code></p>
+                  </div>
+                  <div className="design-item">
+                    <span className="design-bullet">→</span>
+                    <p>Widget fetches definitions when <code>mode="defiActions"</code> is active</p>
+                  </div>
+                </div>
+
+                <div className="proposal-code">
+                  <h3>Integrator Experience</h3>
+                  <CodeBlock code={`<LiFiWidget
+  mode="defiActions"
+  actions={[
+    { id: 'morpho-usdc-base' },
+    { id: 'aave-usdc-op' }
+  ]}
+/>`} />
+                </div>
+
+                <div className="proposal-flow">
+                  <h3>User Flow</h3>
+                  <div className="flow-steps">
+                    <div className="flow-step">Choose action</div>
+                    <div className="flow-arrow">→</div>
+                    <div className="flow-step">Simulation</div>
+                    <div className="flow-arrow">→</div>
+                    <div className="flow-step">Confirm</div>
+                    <div className="flow-arrow">→</div>
+                    <div className="flow-step highlight">Orchestrated execution</div>
+                  </div>
+                </div>
+
+                <div className="strategic-value">
+                  <h4>Strategic Value</h4>
+                  <p>Positions the LI.FI Widget as a <strong>cross-chain DeFi onboarding layer</strong>, not just a swap/bridge UI.</p>
+                </div>
+              </div>
+
+              <div className="proposal-widget">
+                <div className="widget-sticky">
+                  <span className="widget-label">Interactive Preview</span>
+                  <WidgetMockup 
+                    selectedAction={selectedAction} 
+                    onSelectAction={setSelectedAction} 
+                    step={widgetStep} 
+                    onStepChange={setWidgetStep} 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* === SLIDE 6: IMPACT & STANDARDS === */}
+        <section id="impact" className="section section-impact" ref={el => registerSection('impact', el)}>
+          <div className="section-inner">
+            <div className="section-header">
+              <span className="section-number">06</span>
+              <h2 className="section-title">Expected Impact & Standards</h2>
+            </div>
+
+            <div className="effort-comparison">
+              <div className="effort-card before">
+                <div className="effort-header">
+                  <span className="effort-badge bad">Today</span>
+                  <h3>Manual Implementation</h3>
+                </div>
+                <p className="effort-desc">Implementing a multi-step deposit flow manually (e.g., "Bridge ETH → swap to USDC → deposit into Morpho vault") requires:</p>
+                <ul className="effort-list">
+                  <li>Protocol metadata maintenance</li>
+                  <li>Custom Composer wiring</li>
+                  <li>Bespoke onboarding UX & explanations</li>
+                  <li>Error handling + simulation management</li>
+                  <li>Ongoing protocol change maintenance</li>
+                </ul>
+                <div className="effort-stat">
+                  <span className="stat-number bad">3–8 days</span>
+                  <span className="stat-label">engineering effort per flow</span>
+                </div>
+                <p className="effort-note">Assumption based on typical partner patterns; subject to validation.</p>
+              </div>
+
+              <div className="effort-arrow-block">
+                <div className="arrow-line"></div>
+                <span className="arrow-label">With DeFi Actions Mode</span>
+              </div>
+
+              <div className="effort-card after">
+                <div className="effort-header">
+                  <span className="effort-badge good">Proposed</span>
+                  <h3>Configuration-Based</h3>
+                </div>
+                <p className="effort-desc">Integrator selects actionIds → configures the widget → tests → ships.</p>
+                <div className="effort-stat">
+                  <span className="stat-number good">≤ 1 day</span>
+                  <span className="stat-label">integration effort</span>
+                </div>
+                <p className="effort-note">Assumption based on current widget integration minus orchestration overhead.</p>
+              </div>
+            </div>
+
+            <div className="standards-section">
+              <h3>Standards Alignment</h3>
+              <p className="standards-intro">The Widget supports (factually grounded in Widget docs):</p>
+              <div className="standards-grid">
+                <div className="standard-item">
+                  <span className="standard-icon">✓</span>
+                  <span>EIP-5792</span>
+                </div>
+                <div className="standard-item">
+                  <span className="standard-icon">✓</span>
+                  <span>Permit2</span>
+                </div>
+                <div className="standard-item">
+                  <span className="standard-icon">✓</span>
+                  <span>ERC-2612</span>
+                </div>
+                <div className="standard-item">
+                  <span className="standard-icon">✓</span>
+                  <span>EIP-712</span>
+                </div>
+              </div>
+              <p className="standards-note">These help reduce UX friction (e.g., fewer approvals).</p>
+              <div className="scope-note">
+                <span className="scope-icon">ℹ️</span>
+                <span>Composer today is <strong>EVM-only</strong> and focuses on DeFi interactions & tokenized positions — hence v1 should stay within these boundaries.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* === SLIDE 7: PRD SNAPSHOT === */}
+        <section id="prd" className="section section-prd" ref={el => registerSection('prd', el)}>
+          <div className="section-inner">
+            <div className="section-header">
+              <span className="section-number">07</span>
+              <h2 className="section-title">v1 PRD Snapshot</h2>
+            </div>
+
+            <div className="prd-intro">
+              <div className="prd-box problem-box">
+                <h4>Problem</h4>
+                <p>Multi-step cross-chain DeFi onboarding flows are <strong>too costly</strong> for integrators to implement manually, limiting Widget adoption in these scenarios.</p>
+              </div>
+              <div className="prd-box goal-box">
+                <h4>Product Goal</h4>
+                <p>Expand LI.FI Widget adoption into DeFi onboarding use cases by exposing curated Composer flows as configurable <strong>"DeFi Actions"</strong>.</p>
+              </div>
+            </div>
+
+            <div className="prd-columns">
+              <div className="prd-column">
+                <h3>v1 Functional Scope</h3>
+                <div className="scope-list">
+                  <div className="scope-item"><span className="scope-check">✓</span>New mode: <code>mode="defiActions"</code></div>
+                  <div className="scope-item"><span className="scope-check">✓</span>Action list with metadata</div>
+                  <div className="scope-item"><span className="scope-check">✓</span>Action detail view with step breakdown</div>
+                  <div className="scope-item"><span className="scope-check">✓</span>Pre-execution simulation results</div>
+                  <div className="scope-item"><span className="scope-check">✓</span>Composer-powered execution (Zap)</div>
+                  <div className="scope-item"><span className="scope-check">✓</span>EVM-only</div>
+                  <div className="scope-item"><span className="scope-check">✓</span>Deposit-type actions for v1</div>
+                </div>
+              </div>
+
+              <div className="prd-column">
+                <h3>v1 Non-Functional Scope</h3>
+                <div className="scope-list">
+                  <div className="scope-item"><span className="scope-check">✓</span>Versioned Action Registry</div>
+                  <div className="scope-item"><span className="scope-check">✓</span>Feature-flag rollout</div>
+                  <div className="scope-item"><span className="scope-check">✓</span>Explicit failure UX (no silent fallback)</div>
+                  <div className="scope-item"><span className="scope-check">✓</span>Telemetry events:</div>
+                  <div className="telemetry-events">
+                    <span className="event-tag">action_viewed</span>
+                    <span className="event-tag">action_started</span>
+                    <span className="event-tag">simulation_failed</span>
+                    <span className="event-tag">action_completed</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="prd-column">
+                <h3>Non-Goals (v1)</h3>
+                <div className="non-goals-list">
+                  <div className="non-goal-item"><span className="non-goal-x">✗</span>APR/yield display</div>
+                  <div className="non-goal-item"><span className="non-goal-x">✗</span>Self-service action creation</div>
+                  <div className="non-goal-item"><span className="non-goal-x">✗</span>Complex exit flows</div>
+                  <div className="non-goal-item"><span className="non-goal-x">✗</span>Multi-VM support</div>
+                  <div className="non-goal-item"><span className="non-goal-x">✗</span>Fully auto-generated metadata</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* === SLIDE 8: STAKEHOLDERS & RISKS === */}
+        <section id="stakeholders" className="section section-stakeholders" ref={el => registerSection('stakeholders', el)}>
+          <div className="section-inner">
+            <div className="section-header">
+              <span className="section-number">08</span>
+              <h2 className="section-title">Stakeholders, Deliverables & Risks</h2>
+            </div>
+
+            <div className="stakeholders-grid">
+              <div className="stakeholder-card">
+                <div className="stakeholder-icon">⚙️</div>
+                <h4>Tech Lead / Engineering</h4>
+                <ul>
+                  <li>Feasibility, architecture, constraints</li>
+                  <li>Error/simulation handling</li>
+                  <li>Registry structure design</li>
+                </ul>
+              </div>
+              <div className="stakeholder-card">
+                <div className="stakeholder-icon">🎨</div>
+                <h4>Design</h4>
+                <ul>
+                  <li>UI patterns for action lists, details</li>
+                  <li>Simulation state visuals</li>
+                  <li>Clear messaging for multi-step flows</li>
+                </ul>
+              </div>
+              <div className="stakeholder-card">
+                <div className="stakeholder-icon">🤝</div>
+                <h4>BD / DevRel</h4>
+                <ul>
+                  <li>Identify design partners</li>
+                  <li>Prioritize protocols for v1</li>
+                  <li>Validate integrator needs</li>
+                </ul>
+              </div>
+              <div className="stakeholder-card">
+                <div className="stakeholder-icon">🏦</div>
+                <h4>Protocol Partners</h4>
+                <ul>
+                  <li>Validate protocol metadata</li>
+                  <li>Contract assumptions</li>
+                  <li>Zap correctness review</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="deliverables-section">
+              <h3>Deliverables After Design Phase</h3>
+              <div className="deliverables-list">
+                <span className="deliverable-item">PRD (DeFi Actions Mode)</span>
+                <span className="deliverable-item">UX flows & screens</span>
+                <span className="deliverable-item">v1 Action Registry</span>
+                <span className="deliverable-item">Example widget configs</span>
+                <span className="deliverable-item">MVP scope + acceptance criteria</span>
+              </div>
+            </div>
+
+            <div className="risks-section">
+              <h3>Risks & Mitigations</h3>
+              <div className="risks-grid">
+                <div className="risk-card">
+                  <div className="risk-header">
+                    <span className="risk-icon">⚠️</span>
+                    <span className="risk-title">Protocol updates break flows</span>
+                  </div>
+                  <div className="risk-mitigation">
+                    <span className="mitigation-label">Mitigation:</span>
+                    <span>Versioning + active monitoring</span>
+                  </div>
+                </div>
+                <div className="risk-card">
+                  <div className="risk-header">
+                    <span className="risk-icon">⚠️</span>
+                    <span className="risk-title">Simulation inconsistency across chains</span>
+                  </div>
+                  <div className="risk-mitigation">
+                    <span className="mitigation-label">Mitigation:</span>
+                    <span>Multi-chain QA + limited v1 scope</span>
+                  </div>
+                </div>
+                <div className="risk-card">
+                  <div className="risk-header">
+                    <span className="risk-icon">⚠️</span>
+                    <span className="risk-title">Too many actions → unclear UX</span>
+                  </div>
+                  <div className="risk-mitigation">
+                    <span className="mitigation-label">Mitigation:</span>
+                    <span>Small curated v1 list</span>
+                  </div>
+                </div>
+                <div className="risk-card">
+                  <div className="risk-header">
+                    <span className="risk-icon">⚠️</span>
+                    <span className="risk-title">Scope creep into full automation</span>
+                  </div>
+                  <div className="risk-mitigation">
+                    <span className="mitigation-label">Mitigation:</span>
+                    <span>Deposit-only v1</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* === SLIDE 9: DEVELOPMENT EPICS === */}
+        <section id="development" className="section section-development" ref={el => registerSection('development', el)}>
+          <div className="section-inner">
+            <div className="section-header">
+              <span className="section-number">09</span>
+              <h2 className="section-title">Development Epics & PM Role</h2>
+            </div>
+
+            <div className="epics-grid">
+              <div className="epic-card">
+                <div className="epic-number">1</div>
+                <h4>Action Registry (Internal)</h4>
+                <ul>
+                  <li>Data model & versioning</li>
+                  <li>Safety flags (beta/active/deprecated)</li>
+                  <li>Simple internal update flow</li>
+                </ul>
+              </div>
+              <div className="epic-card">
+                <div className="epic-number">2</div>
+                <h4>Widget UI: DeFi Actions Mode</h4>
+                <ul>
+                  <li>Action list & detail views</li>
+                  <li>Simulation UX</li>
+                  <li>Error handling patterns</li>
+                  <li>Integration with existing theme</li>
+                </ul>
+              </div>
+              <div className="epic-card">
+                <div className="epic-number">3</div>
+                <h4>Composer Integration Layer</h4>
+                <ul>
+                  <li>Mapping actionId → Composer Zap</li>
+                  <li>Unified simulation output</li>
+                  <li>Standardized error messages</li>
+                </ul>
+              </div>
+              <div className="epic-card">
+                <div className="epic-number">4</div>
+                <h4>Docs, Telemetry, Playground</h4>
+                <ul>
+                  <li>New docs section (config examples)</li>
+                  <li>Playground presets</li>
+                  <li>Telemetry event schema</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="pm-section">
+              <h3>PM Responsibilities</h3>
+              <div className="pm-grid">
+                <div className="pm-item">
+                  <span className="pm-icon">📋</span>
+                  <span>Refine PRD into epics + vertical slices</span>
+                </div>
+                <div className="pm-item">
+                  <span className="pm-icon">🧪</span>
+                  <span>Validate early slices live in staging with real wallets & chains</span>
+                </div>
+                <div className="pm-item">
+                  <span className="pm-icon">🤝</span>
+                  <span>Coordinate design partners for feedback</span>
+                </div>
+                <div className="pm-item">
+                  <span className="pm-icon">✅</span>
+                  <span>Ensure acceptance criteria are tight and testable</span>
+                </div>
+                <div className="pm-item">
+                  <span className="pm-icon">📢</span>
+                  <span>Align BD/DevRel for rollout timing and communication</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* === SLIDE 10: DEPLOYMENT & SUCCESS === */}
+        <section id="deployment" className="section section-deployment" ref={el => registerSection('deployment', el)}>
+          <div className="section-inner">
+            <div className="section-header">
+              <span className="section-number">10</span>
+              <h2 className="section-title">Deployment, GTM & Success Criteria</h2>
+            </div>
+
+            <div className="deployment-phases">
+              <div className="phase-card">
+                <div className="phase-header">
+                  <span className="phase-number">1</span>
+                  <h3>Testing & QA</h3>
+                </div>
+                <div className="phase-content">
+                  <div className="phase-row">
+                    <span className="phase-label">Chains:</span>
+                    <span>Ethereum + 1–2 L2s (Base, Optimism)</span>
+                  </div>
+                  <div className="phase-row">
+                    <span className="phase-label">Wallets:</span>
+                    <span>MetaMask, WalletConnect, mobile wallet</span>
+                  </div>
+                  <div className="phase-row">
+                    <span className="phase-label">Frontends:</span>
+                    <span>React + Next.js embedding tests</span>
+                  </div>
+                  <div className="phase-row">
+                    <span className="phase-label">Scenarios:</span>
+                    <span>Fuzz testing of simulation failures, liquidity issues, revert paths</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="phase-connector"></div>
+
+              <div className="phase-card">
+                <div className="phase-header">
+                  <span className="phase-number">2</span>
+                  <h3>Design Partner Beta</h3>
+                </div>
+                <div className="phase-content">
+                  <p className="phase-partners">One wallet, one protocol, one appchain</p>
+                  <div className="phase-metrics">
+                    <span className="phase-metric-label">Measure (targets, not assumed truths):</span>
+                    <div className="metric-items">
+                      <span className="metric-item">Integration time (goal: ≤ 1 day)</span>
+                      <span className="metric-item">Completion rate vs baseline</span>
+                      <span className="metric-item">Developer sentiment</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="phase-connector"></div>
+
+              <div className="phase-card">
+                <div className="phase-header">
+                  <span className="phase-number">3</span>
+                  <h3>Public Rollout</h3>
+                </div>
+                <div className="phase-content">
+                  <div className="rollout-items">
+                    <span className="rollout-item">Documentation + Playground update</span>
+                    <span className="rollout-item">Changelog + announcement</span>
+                    <span className="rollout-item">BD/DevRel outreach for DeFi onboarding use cases</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="success-section">
+              <h3>Success Criteria</h3>
+              <p className="success-subtitle">Targets / Assumptions</p>
+              <div className="success-grid">
+                <div className="success-card">
+                  <span className="success-icon">📈</span>
+                  <span className="success-metric">≥ 5 integrators</span>
+                  <span className="success-label">enabling DeFi Actions Mode within ~8 weeks</span>
+                </div>
+                <div className="success-card">
+                  <span className="success-icon">🔄</span>
+                  <span className="success-metric">At least 2</span>
+                  <span className="success-label">are existing widget users adopting new DeFi use cases</span>
+                </div>
+                <div className="success-card">
+                  <span className="success-icon">⚡</span>
+                  <span className="success-metric">≤ 1 day</span>
+                  <span className="success-label">integration time for DeFi flows (validated via partners)</span>
+                </div>
+                <div className="success-card">
+                  <span className="success-icon">💬</span>
+                  <span className="success-metric">Fewer</span>
+                  <span className="success-label">onboarding-related support questions</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="closing-statement">
+              <div className="closing-icon">🚀</div>
+              <p className="closing-main">LI.FI Widget evolves from <strong>"swap/bridge UI"</strong> → <strong>intent & onboarding UI</strong></p>
+              <p className="closing-sub">Leveraging Composer as a product surface, not just infrastructure</p>
+            </div>
+          </div>
+        </section>
       </main>
-
-      <footer className="demo-footer">
-        <SlideIndicator current={currentSlide} total={SLIDES.length} onNavigate={goToSlide} />
-        <NavigationControls current={currentSlide} total={SLIDES.length} onPrev={goPrev} onNext={goNext} />
-      </footer>
     </div>
   );
 }
