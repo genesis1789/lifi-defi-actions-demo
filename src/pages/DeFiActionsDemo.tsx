@@ -1018,4 +1018,3 @@ export default function DeFiActionsDemo() {
     </div>
   );
 }
-
