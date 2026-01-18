@@ -1,8 +1,6 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import DeFiActionsDemo from './pages/DeFiActionsDemo';
 import Refinements from './pages/Refinements';
-import WidgetRecipesProposal from './pages/WidgetRecipesProposal';
-import WidgetIterationDemo from './pages/WidgetIterationDemo';
 
 function App() {
   return (
@@ -13,11 +11,8 @@ function App() {
       {/* Quick add-on: What I'd refine */}
       <Route path="/refinements" element={<Refinements />} />
       
-      {/* Full detailed proposal (if needed) */}
-      <Route path="/proposal" element={<WidgetRecipesProposal />} />
-      
-      {/* Other pages */}
-      <Route path="/widget-comparison" element={<WidgetIterationDemo />} />
+      {/* Redirect all other routes to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
