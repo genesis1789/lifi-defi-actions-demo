@@ -8,7 +8,6 @@ export default function Refinements() {
         <h1>What I'd Refine</h1>
       </header>
 
-      {/* Learning 1 */}
       <section className="ref-block">
         <div className="ref-block__number">01</div>
         <div className="ref-block__content">
@@ -22,7 +21,6 @@ export default function Refinements() {
         </div>
       </section>
 
-      {/* Learning 2 */}
       <section className="ref-block">
         <div className="ref-block__number">02</div>
         <div className="ref-block__content">
@@ -40,7 +38,6 @@ export default function Refinements() {
         </div>
       </section>
 
-      {/* Learning 3 */}
       <section className="ref-block">
         <div className="ref-block__number">03</div>
         <div className="ref-block__content">
@@ -71,7 +68,6 @@ export default function Refinements() {
         </div>
       </section>
 
-      {/* Strategic Fit */}
       <section className="ref-block ref-block--strategy">
         <div className="ref-block__number">04</div>
         <div className="ref-block__content">
@@ -132,7 +128,6 @@ export default function Refinements() {
         </div>
       </section>
 
-      {/* Risk */}
       <section className="ref-block">
         <div className="ref-block__number">05</div>
         <div className="ref-block__content">
@@ -146,7 +141,6 @@ export default function Refinements() {
         </div>
       </section>
 
-      {/* Bottom Line */}
       <section className="ref-bottom">
         <p>
           <strong>Same goal:</strong> enable deposits for Widget users.<br/>

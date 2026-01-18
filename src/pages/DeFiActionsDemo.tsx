@@ -10,7 +10,6 @@ function LiFiLogoIcon({ className = '', size = 24 }: { className?: string; size?
   );
 }
 
-// === Types ===
 interface DeFiAction {
   id: string;
   label: string;
